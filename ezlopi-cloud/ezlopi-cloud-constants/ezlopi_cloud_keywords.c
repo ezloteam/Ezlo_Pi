@@ -3,14 +3,11 @@
  * @file    ezlopi_cloud_device_types_str.c
  * @brief
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -39,6 +36,15 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_cloud_keywords.c
+ * @brief   Definitions for cloud keywords
+ * @author
+ * @version 1.0
+ * @date    January 20, 2024
+ */
+
 #ifndef __EZLOPI_CLOUD_KEYWORDS_H__
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 

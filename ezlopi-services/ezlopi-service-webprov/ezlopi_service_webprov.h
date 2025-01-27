@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,14 @@
 
 /**
  * @file    ezlopi_service_webprov.h
- * @brief
+ * @brief   ontains function declarations related to web provisioning
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    July 21st, 2022 9:28 PM
  */
 
-#ifndef _EZLOPI_SERVICE_WEBPROV_H_
-#define _EZLOPI_SERVICE_WEBPROV_H_
+#ifndef __EZLOPI_SERVICE_WEBPROV_H__
+#define __EZLOPI_SERVICE_WEBPROV_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -104,7 +101,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_WEBPROV_H_
+#endif // __EZLOPI_SERVICE_WEBPROV_H__
 
 /*******************************************************************************
  *                          End of File

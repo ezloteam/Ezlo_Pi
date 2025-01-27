@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0048_other_MQ4_CH4_detector.c
  * @brief   perform some function on sensor_0048
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -449,7 +449,7 @@ static float __extract_MQ4_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during CH4 presence
         double _ratio = (Rs_gas / (((MQ4_value->MQ4_R0_constant) <= 0) ? (1.0f) : (MQ4_value->MQ4_R0_constant))); // avoid dividing by zero??
-        
+
         //-------------------------------------------------
 
         // 1.2 Calculate _CH4_ppm

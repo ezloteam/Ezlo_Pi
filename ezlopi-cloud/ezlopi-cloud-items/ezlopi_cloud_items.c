@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_items.c
- * @brief
+ * @brief   Definitions for cloud items functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    October 29th, 2022 12:26 AM
  */

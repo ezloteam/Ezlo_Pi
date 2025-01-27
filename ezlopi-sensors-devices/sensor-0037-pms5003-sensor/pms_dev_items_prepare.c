@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    pms_dev_items_prepare.c
  * @brief   perform some function to prepare 'pms_dev_items'
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */

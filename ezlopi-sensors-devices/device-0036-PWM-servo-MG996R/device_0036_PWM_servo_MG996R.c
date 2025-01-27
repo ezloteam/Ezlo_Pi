@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,7 @@
 /**
  * @file    device_0036_PWM_servo_MG996R.c
  * @brief   perform some function on device_0036
- * @author  Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
+ * @author
  * @version 1.0
  * @date    June 7th, 2023 6:14 PM
  */

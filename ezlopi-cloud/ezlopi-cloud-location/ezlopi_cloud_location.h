@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,14 @@
 
 /**
  * @file    ezlopi_cloud_location.h
- * @brief
+ * @brief   Declarations for cloud location functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    January 30th, 2024 9:22 PM
  */
 
-#ifndef _EZLOPI_CLOUD_LOCATION_H_
-#define _EZLOPI_CLOUD_LOCATION_H_
+#ifndef __EZLOPI_CLOUD_LOCATION_H__
+#define __EZLOPI_CLOUD_LOCATION_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -93,7 +90,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_LOCATION_H_
+#endif // __EZLOPI_CLOUD_LOCATION_H__
 
 /*******************************************************************************
  *                          End of File

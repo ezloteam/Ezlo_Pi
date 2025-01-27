@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,6 @@
  * @file    ezlopi_core_cjson_macros.h
  * @brief   Macros for cjson operations
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 0.1
  * @date    December 7th, 2023 7:42 PM
  */

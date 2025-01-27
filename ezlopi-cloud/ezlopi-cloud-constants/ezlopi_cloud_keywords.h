@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_device_types_str.c
- * @brief
+ * @brief   Declarations for cloud keywords
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    October 23rd, 2022 9:53 PM
  */

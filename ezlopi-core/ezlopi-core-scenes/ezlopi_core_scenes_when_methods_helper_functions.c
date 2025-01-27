@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,6 @@
  * @file    ezlopi_core_scenes_when_methods_helper_functions.c
  * @brief   Functions that operates on scene-when-methods
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    12th DEC 2024
  */

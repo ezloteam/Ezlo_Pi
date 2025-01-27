@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,9 @@
 /**
  * @file    device_0038_other_RGB.c
  * @brief   perform some function on device_0038
- * @author  Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
- * @version 1.0
- * @date    August 31st, 2023 4:10 PM
+ * @author
+ * @version 0.1
+ * @date    xx
  */
 
 /*******************************************************************************

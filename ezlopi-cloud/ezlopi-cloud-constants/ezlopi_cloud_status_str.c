@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,9 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @file    ezlopi_cloud_status_strs.c
+ * @brief   Definitions for cloud status strings
+ * @author
  * @version 1.0
  * @date    November 22nd, 2023 3:27 PM
  */

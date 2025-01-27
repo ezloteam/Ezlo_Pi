@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -33,9 +33,6 @@
  * @file    ezlopi_service_ble_security.c
  * @brief   Security service related functionalities
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    July 10, 2022
  */
@@ -43,6 +40,10 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include <string.h>
 
@@ -64,6 +65,14 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_ble.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Type & Macro Definitions
@@ -130,6 +139,18 @@ static void ezpi_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts
  */
 static void ezpi_serv_ble_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 s_gatt_char_t *passkey_characterstic = NULL;
 static uint32_t start_tick = 0;
@@ -168,6 +189,10 @@ void EZPI_ble_service_security_init(void)
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     factory_reset_characterstic = EZPI_core_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezpi_serv_ble_factory_reset_write_func, NULL);
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)

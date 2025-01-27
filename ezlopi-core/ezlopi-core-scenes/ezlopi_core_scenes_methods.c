@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,6 @@
  * @file    ezlopi_core_scenes_methods.c
  * @brief   This file contains function to return scene-methods
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    September 5th, 2023 6:56 PM
  */

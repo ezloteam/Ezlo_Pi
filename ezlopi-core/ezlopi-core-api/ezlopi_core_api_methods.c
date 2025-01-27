@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,6 @@
  * @file    ezlopi_core_api_methods.c
  * @brief   Functions perform operation for API-methods
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    February 25th, 2024 12:37 AM
  */

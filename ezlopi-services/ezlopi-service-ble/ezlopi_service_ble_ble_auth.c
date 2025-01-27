@@ -3,14 +3,11 @@
  * @file    ezlopi_service_ble_ble_auth.c
  * @brief
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -39,6 +36,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_ble_ble_auth.c
+ * @brief   File contains functions definitions for user authentication through BLE
+ * @author
+ * @version 1.0
+ * @date    January 22, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -87,12 +96,12 @@ static e_auth_status_t sg_last_auth_status = BLE_AUTH_STATUS_UNKNOWN;
  * Convention : Use capital letter for initial word on extern function
  * @param arg
  */
-e_auth_status_t ezlopi_ble_auth_last_status(void)
+e_auth_status_t EZPI_ble_auth_last_status(void)
 {
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_store_user_id(char *user_id)
+e_auth_status_t EZPI_ble_auth_store_user_id(char *user_id)
 {
     if (user_id)
     {
@@ -110,7 +119,7 @@ e_auth_status_t ezlopi_ble_auth_store_user_id(char *user_id)
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
+e_auth_status_t EZPI_ble_auth_check_user_id(char *user_id)
 {
     char *stored_user_id = EZPI_core_nvs_read_user_id_str();
 
@@ -142,7 +151,7 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
     return sg_last_auth_status;
 }
 
-char *ezlopi_ble_auth_status_to_string(e_auth_status_t status)
+char *EZPI_ble_auth_status_to_string(e_auth_status_t status)
 {
     char *ret = "BLE_AUTH_STATUS_UNKNOWN";
 

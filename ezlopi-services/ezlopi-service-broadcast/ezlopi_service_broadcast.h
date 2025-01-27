@@ -3,14 +3,11 @@
  * @file    ezlopi_service_broadcast.h
  * @brief
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -40,13 +37,40 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_broadcast.h
+ * @brief   Contains function declarations for data broadcast
+ * @author  
+ * @version 1.0
+ * @date    February 27, 2024
+ */
+
 #ifndef __EZLOPI_SERVICE_BROADCAST_H__
 #define __EZLOPI_SERVICE_BROADCAST_H__
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to initialize broad cast service
      * @details This function performs following operations

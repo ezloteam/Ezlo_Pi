@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,13 @@
 
 /**
  * @file    ezlopi_service_meshbot.h
- * @brief
+ * @brief   Contains function declarations for meshbot related operations
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    November 2nd, 2023 6:28 PM
  */
-
-#ifndef _EZLOPI_SERVICE_MESHBOT_H_
-#define _EZLOPI_SERVICE_MESHBOT_H_
+#ifndef __EZLOPI_SERVICE_MESHBOT_H__
+#define __EZLOPI_SERVICE_MESHBOT_H__
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
@@ -128,7 +124,7 @@ extern "C"
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#endif // _EZLOPI_SERVICE_MESHBOT_H_
+#endif // __EZLOPI_SERVICE_MESHBOT_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

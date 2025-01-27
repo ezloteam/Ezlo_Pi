@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,14 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_scenes_block_list.c
- * @brief
+ * @brief   Definitions for cloud scenes block list functions
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    December 18th, 2023 2:59 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -62,29 +60,29 @@
 
 #include "ezlopi_service_meshbot.h"
 
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Extern Function Declarations
-     *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Type & Macro Definitions
-     *******************************************************************************/
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Static Function Prototypes
-     *******************************************************************************/
-    /**
-     * @brief Function to convert when block to JSON
-     *
-     * @param when_block Pointer to the when block to convert
-     * @return cJSON*
-     */
-    static cJSON *
-    __create_when_block_cjson(l_when_block_v2_t *when_block);
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+/**
+ * @brief Function to convert when block to JSON
+ *
+ * @param when_block Pointer to the when block to convert
+ * @return cJSON*
+ */
+static cJSON *
+__create_when_block_cjson(l_when_block_v2_t *when_block);
 /**
  * @brief Function to add block optiosn and fields to the JSON
  *

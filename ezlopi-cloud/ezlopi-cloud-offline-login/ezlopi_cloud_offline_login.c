@@ -1,6 +1,6 @@
 
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,11 +32,8 @@
 
 /**
  * @file    ezlopi_cloud_offline_login.c
- * @brief
+ * @brief   Definitions for cloud offline login functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    March 26th, 2024 10:59 PM
  */

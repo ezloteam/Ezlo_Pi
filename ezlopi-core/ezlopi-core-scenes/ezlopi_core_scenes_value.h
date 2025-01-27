@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,6 @@
  * @file    ezlopi_core_scenes_value.h
  * @brief   Function to operate on scene-value-types
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -72,24 +69,24 @@ extern "C"
 
     /**
      * @brief Function to return name of value-type
-     * 
+     *
      * @param e_value_type enum of target value-type
-     * @return const char* 
+     * @return const char*
      */
     const char *EZPI_core_scenes_get_scene_value_type_name(e_scene_value_type_v2_t e_value_type);
     /**
      * @brief Function to get enum of corresponding value-type str
-     * 
+     *
      * @param value_type_str pointer to value-type str
-     * @return e_scene_value_type_v2_t 
+     * @return e_scene_value_type_v2_t
      */
     e_scene_value_type_v2_t EZPI_core_scene_get_scene_value_type_enum(const char *value_type_str);
     /**
      * @brief Function to get scene-field value-type
-     * 
+     *
      * @param cj_field Pointer to target field obj
      * @param type_key_str pointer to target type str
-     * @return e_scene_value_type_v2_t 
+     * @return e_scene_value_type_v2_t
      */
     e_scene_value_type_v2_t EZPI_core_scenes_value_get_type(cJSON *cj_field, const char *type_key_str);
 

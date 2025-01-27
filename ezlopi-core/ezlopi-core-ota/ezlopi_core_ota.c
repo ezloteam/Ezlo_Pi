@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,7 @@
 /**
  * @file    ezlopi_core_ota.c
  * @brief   Function to perform ota operation
- * @author  Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
+ * @author
  * @version 1.0
  * @date    March 7th, 2023 8:52 PM
  */

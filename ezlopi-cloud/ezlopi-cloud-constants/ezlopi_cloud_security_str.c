@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_security_str.c
- * @brief
- * @author  Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @brief   Definitions for cloud security strings
+ * @author
  * @version 1.0
  * @date    November 22nd, 2023 3:27 PM
  */

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,78 +32,76 @@
  * @file    ping_sock.h
  * @brief   Function to perfrom operations on ping-socket
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _PING_SOCK_H_
 #define _PING_SOCK_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #pragma once
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-
 #include <stdint.h>
 #include "esp_err.h"
 #include "lwip/ip_addr.h"
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /**
-    * @brief Type of "ping" session handle
-    *
-    */
+     * @brief Type of "ping" session handle
+     *
+     */
     typedef void *esp_ping_handle_t;
 
     /**
-    * @brief Type of "ping" callback functions
-    *
-    */
-    typedef struct {
+     * @brief Type of "ping" callback functions
+     *
+     */
+    typedef struct
+    {
         /**
-        * @brief arguments for callback functions
-        *
-        */
+         * @brief arguments for callback functions
+         *
+         */
         void *cb_args;
 
         /**
-        * @brief Invoked by internal ping thread when received ICMP echo reply packet
-        *
-        */
+         * @brief Invoked by internal ping thread when received ICMP echo reply packet
+         *
+         */
         void (*on_ping_success)(esp_ping_handle_t hdl, void *args);
 
         /**
-        * @brief Invoked by internal ping thread when receive ICMP echo reply packet timeout
-        *
-        */
+         * @brief Invoked by internal ping thread when receive ICMP echo reply packet timeout
+         *
+         */
         void (*on_ping_timeout)(esp_ping_handle_t hdl, void *args);
 
         /**
-        * @brief Invoked by internal ping thread when a ping session is finished
-        *
-        */
+         * @brief Invoked by internal ping thread when a ping session is finished
+         *
+         */
         void (*on_ping_end)(esp_ping_handle_t hdl, void *args);
     } ezlopi_ping_callbacks_t;
 
     /**
-    * @brief Type of "ping" configuration
-    *
-    */
-    typedef struct {
+     * @brief Type of "ping" configuration
+     *
+     */
+    typedef struct
+    {
         uint32_t count;           /*!< A "ping" session contains count procedures */
         uint32_t interval_ms;     /*!< Milliseconds between each ping procedure */
         uint32_t timeout_ms;      /*!< Timeout value (in milliseconds) of each ping procedure */
@@ -120,27 +118,28 @@ extern "C"
      * @brief Default ping configuration
      *
      */
-#define ESP_PING_DEFAULT_CONFIG()        \
-    {                                    \
-        .count = 5,                      \
-        .interval_ms = 1000,             \
-        .timeout_ms = 1000,              \
-        .data_size = 64,                 \
-        .tos = 0,                        \
-        .ttl = IP_DEFAULT_TTL,           \
-        .target_addr = *(IP_ANY_TYPE),   \
-        .task_stack_size = 2048 + TASK_EXTRA_STACK_SIZE,         \
-        .task_prio = 2,                  \
-        .interface = 0,\
+#define ESP_PING_DEFAULT_CONFIG()                        \
+    {                                                    \
+        .count = 5,                                      \
+        .interval_ms = 1000,                             \
+        .timeout_ms = 1000,                              \
+        .data_size = 64,                                 \
+        .tos = 0,                                        \
+        .ttl = IP_DEFAULT_TTL,                           \
+        .target_addr = *(IP_ANY_TYPE),                   \
+        .task_stack_size = 2048 + TASK_EXTRA_STACK_SIZE, \
+        .task_prio = 2,                                  \
+        .interface = 0,                                  \
     }
 
 #define ESP_PING_COUNT_INFINITE (0) /*!< Set ping count to zero will ping target infinitely */
 
-     /**
+    /**
      * @brief Profile of ping session
      *
      */
-    typedef enum {
+    typedef enum
+    {
         ESP_PING_PROF_SEQNO,   /*!< Sequence number of a ping procedure */
         ESP_PING_PROF_TOS,     /*!< Type of service of a ping procedure */
         ESP_PING_PROF_TTL,     /*!< Time to live of a ping procedure */
@@ -153,12 +152,12 @@ extern "C"
     } esp_ping_profile_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Create a ping session
@@ -199,13 +198,13 @@ extern "C"
     esp_err_t EZPI_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
 
     /**
-    * @brief Delete a ping session
-    *
-    * @param hdl handle of ping session
-    * @return
-    *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
-    *      - ESP_OK: delete ping session successfully
-    */
+     * @brief Delete a ping session
+     *
+     * @param hdl handle of ping session
+     * @return
+     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
+     *      - ESP_OK: delete ping session successfully
+     */
     esp_err_t EZPI_ping_delete_session(esp_ping_handle_t hdl);
 
     /**
@@ -218,7 +217,6 @@ extern "C"
      */
     esp_err_t EZPI_ping_stop_by_handle(esp_ping_handle_t hdl);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -226,5 +224,5 @@ extern "C"
 #endif // _PING_SOCK_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

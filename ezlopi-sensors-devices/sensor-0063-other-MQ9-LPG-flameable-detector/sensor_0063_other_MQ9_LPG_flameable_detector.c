@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0063_other_MQ9_LPG_flameable_detector.c
  * @brief   perform some function on sensor_0063
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -455,8 +455,8 @@ static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during LPG_flameable presence
         double _ratio = (Rs_gas / ((MQ9_value->MQ9_R0_constant <= 0) ? (1.0f) : (MQ9_value->MQ9_R0_constant))); // avoid dividing by zero??
-       
-       //-------------------------------------------------
+
+        //-------------------------------------------------
 
         // 1.2 Calculate _LPG_flameable_ppm
         float _LPG_flameable_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq9) / m_slope_mq9); // ---> _LPG_flameable_ppm = 10 ^ [ ( log(ratio) - b ) / m ]

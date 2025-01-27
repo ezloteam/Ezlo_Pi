@@ -3,14 +3,11 @@
  * @file    ezlopi_service_gpioisr.c
  * @brief
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -40,6 +37,18 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_gpioisr.c
+ * @brief   Contains function definitions related to GPIO ISR
+ * @author
+ * @version 1.0
+ * @date    November 23, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
 #include <string.h>
 
 #include "../../build/config/sdkconfig.h"
@@ -55,6 +64,14 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_gpioisr.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Type & Macro Definitions
@@ -92,6 +109,14 @@ static void IRAM_ATTR __gpio_isr_handler(void *arg);
  *******************************************************************************/
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t default_debounce_time = 1000;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 void EZPI_service_gpioisr_init(void)
 {
@@ -132,6 +157,10 @@ void EZPI_service_gpioisr_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_
         TRACE_E("Malloc failed!");
     }
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 static void ezpi_gpio_isr_process_v3(void *pv)
 {

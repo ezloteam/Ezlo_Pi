@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_network.c
- * @brief
+ * @brief    Definitions for cloud netowrk functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Nabin Dangi
  * @version 1.0
  * @date    August 15th, 2022 11:57 AM
  */

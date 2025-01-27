@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,16 +31,13 @@
 
 /**
  * @file    ezlopi_cloud_status.h
- * @brief
- * @author  Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @brief   Declaration for cloud status functions
+ * @author
  * @version 1.0
- * @date    March 7th, 2024 6:27 PM
+ * @date    January 20, 2024
  */
-
-#ifndef _EZLOPI_CLOUD_STATUS_H_
-#define _EZLOPI_CLOUD_STATUS_H_
+#ifndef __EZLOPI_CLOUD_STATUS_H__
+#define __EZLOPI_CLOUD_STATUS_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -79,7 +76,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_STATUS_H_
+#endif // __EZLOPI_CLOUD_STATUS_H__
 
 /*******************************************************************************
  *                          End of File

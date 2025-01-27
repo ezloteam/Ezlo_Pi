@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0059_other_MQ6_LPG_detector.c
  * @brief   perform some function on sensor_0059
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -455,7 +455,7 @@ static float __extract_MQ6_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during LPG presence
         double _ratio = (Rs_gas / ((MQ6_value->MQ6_R0_constant <= 0) ? (1.0f) : (MQ6_value->MQ6_R0_constant))); // avoid dividing by zero??
-        
+
         //-------------------------------------------------
 
         // 1.2 Calculate _LPG_ppm

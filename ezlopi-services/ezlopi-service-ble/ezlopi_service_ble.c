@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -33,9 +33,6 @@
  * @file    ezlopi_service_ble.c
  * @brief   Service related functionalities
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    December 8th, 2022 5:39 PM
  */
@@ -77,6 +74,10 @@
 #include "ezlopi_service_ble.h"
 
 /*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
  *                          Extern Function Declarations
  *******************************************************************************/
 /**
@@ -99,6 +100,10 @@ extern void EZPI_ble_service_device_info_init(void);
  * @brief Function to prepare BLE dynamic device config services
  */
 extern void EZPI_ble_service_dynamic_config_init(void);
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Static Function Prototypes
@@ -129,6 +134,18 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
  */
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif // CONFIG_EZPI_BLE_ENALBE_PASSKEY
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 void EZPI_ble_service_init(void)
 {

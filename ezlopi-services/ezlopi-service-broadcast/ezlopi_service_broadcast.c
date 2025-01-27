@@ -3,14 +3,11 @@
  * @file    ezlopi_service_broadcast.c
  * @brief
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -40,6 +37,18 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_broadcast.c
+ * @brief   Contains function definitions for data broadcast
+ * @author
+ * @version 1.0
+ * @date    February 27, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
 #include <time.h>
 
 #include "freertos/FreeRTOS.h"
@@ -56,6 +65,18 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_otel.h"
 #include "ezlopi_service_broadcast.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Static Function Prototypes
@@ -81,6 +102,14 @@ static ezlopi_error_t ezpi_service_broadcast_send_to_queue(s_broadcast_struct_t 
  *******************************************************************************/
 static QueueHandle_t __broadcast_queue = NULL;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
 void EZPI_service_broadcast_init(void)
 {
     __broadcast_queue = xQueueCreate(10, sizeof(cJSON *));
@@ -90,6 +119,10 @@ void EZPI_service_broadcast_init(void)
         EZPI_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
     }
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 static void __broadcast_loop(void *arg)
 {

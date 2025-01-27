@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,7 @@
 /**
  * @file    ezlopi_core_processes.c
  * @brief   Function to perform operation on ezlopi-process/task
- * @author  Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
+ * @author
  * @version 1.0
  * @date    March 7th, 2024 6:27 PM
  */

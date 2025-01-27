@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,8 @@
 
 /**
  * @file    ezlopi_service_ota.c
- * @brief
- * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
+ * @brief   Contains function definitions related to OTA operations
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)n
  * @version 1.0
  * @date    April 27th, 2023 6:21 PM
  */

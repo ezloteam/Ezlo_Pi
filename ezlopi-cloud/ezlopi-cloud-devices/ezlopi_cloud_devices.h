@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,14 +30,12 @@
 */
 /**
  * @file    ezlopi_cloud_devices.h
- * @brief
+ * @brief   Definitions for cloud device functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    May 24th, 2023 4:58 PM
  */
+
 #ifndef __HUB_DEVICE_LIST_H__
 #define __HUB_DEVICE_LIST_H__
 /*******************************************************************************

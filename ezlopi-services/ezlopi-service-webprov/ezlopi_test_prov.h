@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,9 +30,9 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_test_prov.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  
  * @version 0.1
  * @date    1st January 2024
  */
@@ -59,18 +59,18 @@ extern "C"
      *******************************************************************************/
     extern const uint32_t test_version_num;
 
-    extern const char * test_id_str;
-    extern const char * test_uuid_str;
-    extern const char * test_hardware_type;
-    extern const char * test_cloud_uuid;
-    extern const char * test_up_domain;
-    extern const char * test_cloud_uuid;
-    extern const char * test_coordinator_url;
-    extern const char * test_prov_token;
-    extern const char * test_ssl_pvt_key;
-    extern const char * test_ssl_pub_key;
-    extern const char * test_ssl_shared_key;
-    extern const char * test_ca_cert;
+    extern const char *test_id_str;
+    extern const char *test_uuid_str;
+    extern const char *test_hardware_type;
+    extern const char *test_cloud_uuid;
+    extern const char *test_up_domain;
+    extern const char *test_cloud_uuid;
+    extern const char *test_coordinator_url;
+    extern const char *test_prov_token;
+    extern const char *test_ssl_pvt_key;
+    extern const char *test_ssl_pub_key;
+    extern const char *test_ssl_shared_key;
+    extern const char *test_ca_cert;
 
     /*******************************************************************************
      *                          Extern Data Declarations

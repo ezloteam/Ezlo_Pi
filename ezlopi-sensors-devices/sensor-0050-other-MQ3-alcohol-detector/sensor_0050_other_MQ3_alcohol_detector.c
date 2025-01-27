@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0050_other_MQ3_alcohol_detector.c
  * @brief   perform some function on sensor_0050
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -452,7 +452,7 @@ static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during alcohol presence
         double _ratio = (Rs_gas / ((MQ3_value->MQ3_R0_constant <= 0) ? (1.0f) : (MQ3_value->MQ3_R0_constant))); // avoid dividing by zero??
-        
+
         //-------------------------------------------------
 
         // 1.2 Calculate _alcohol_ppm

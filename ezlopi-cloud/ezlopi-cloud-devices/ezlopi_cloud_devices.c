@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_devices.c
- * @brief
+ * @brief   Declarations for cloud device functions
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version 1.0
  * @date    May 24th, 2023 4:58 PM
  */
@@ -75,7 +72,7 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-//------------------------------------------------------------------------------------------------------------------
+
 /**
  * @brief Function to generate sha1 for src
  *
@@ -96,7 +93,7 @@ static char *ezpi_generate_sha1_of_src(const char *src);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-//------------------------------------------------------------------------------------------------------------------
+
 void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);

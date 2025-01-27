@@ -20,7 +20,7 @@ set(EZLOPI_SERVICE_COMPONENTS
     ezlopi-service-gpioisr
 )
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "pms_dev_items_prepare.c" "pms5003.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS}

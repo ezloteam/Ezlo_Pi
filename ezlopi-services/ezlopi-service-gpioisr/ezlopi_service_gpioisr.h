@@ -3,14 +3,11 @@
  * @file    ezlopi_service_gpioisr.h
  * @brief
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -40,8 +37,16 @@
 ** ===========================================================================
 */
 
-#ifndef _EZLOPI_SERVICE_GPIOISR_H_
-#define _EZLOPI_SERVICE_GPIOISR_H_
+/**
+ * @file    ezlopi_service_gpioisr.h
+ * @brief   Contains function declarations related to GPIO ISR
+ * @author  
+ * @version 1.0
+ * @date    November 23, 2024
+ */
+
+#ifndef __EZLOPI_SERVICE_GPIOISR_H__
+#define __EZLOPI_SERVICE_GPIOISR_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -55,6 +60,18 @@
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function handles the interrupt registered for corresponding GPIO
@@ -86,7 +103,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_GPIOISR_H_
+#endif // __EZLOPI_SERVICE_GPIOISR_H__
 
 /*******************************************************************************
  *                          End of File

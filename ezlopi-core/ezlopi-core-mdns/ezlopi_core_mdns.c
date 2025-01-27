@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,7 @@
 /**
  * @file    ezlopi_core_mdns.c
  * @brief   Function to operate on mdns
- * @author  Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
+ * @author
  * @version 1.0
  * @date    February 24th, 2024 12:20 AM
  */
@@ -108,7 +106,7 @@ ezlopi_error_t EZPI_init_mdns(void)
 
 #warning "__mdns_init task can be shifted to loop"
     xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
-    
+
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 #endif

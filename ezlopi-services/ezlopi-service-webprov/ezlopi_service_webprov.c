@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,8 @@
 
 /**
  * @file    ezlopi_service_webprov.c
- * @brief
+ * @brief    Contains function definitions related to web provisioning
  * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
- *          Lomas Subedi
- *          Nabin Dangi
- *          Riken Maharjan
  * @version 1.0
  * @date    August 15th, 2022 11:57 AM
  */
@@ -99,14 +96,6 @@ typedef struct
 } s_rx_message_t;
 
 /*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-static uint32_t message_counter = 0;
-static xTaskHandle _task_handle = NULL;
-static QueueHandle_t _wss_message_queue = NULL;
-static esp_websocket_client_handle_t wss_client = NULL;
-static TaskHandle_t __web_socket_initialize_handler = NULL;
-/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 static void __provision_check(void *pv);
@@ -119,6 +108,16 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_stamp);
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+static uint32_t message_counter = 0;
+static xTaskHandle _task_handle = NULL;
+static QueueHandle_t _wss_message_queue = NULL;
+static esp_websocket_client_handle_t wss_client = NULL;
+static TaskHandle_t __web_socket_initialize_handler = NULL;
 
 bool EZPI_service_webprov_is_connected(void)
 {

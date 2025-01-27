@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,7 @@
 /**
  * @file    ezlopi_core_device_group.c
  * @brief   These function perform operation on device-groups
- * @author  Riken Maharjan
- *          Nabin Dangi
- *          Lomas Subedi
+ * @author
  * @version 0.1
  * @date    July 3rd, 2024 7:15 PM
  */

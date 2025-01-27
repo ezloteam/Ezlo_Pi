@@ -1,5 +1,5 @@
-/* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+/** ===========================================================================
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,13 +31,16 @@
 
 /**
  * @file    ezlopi_cloud_coordinates.c
- * @brief
- * @author  Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @brief   Definitions for cloud coordinate functions
+ * @author
+ * @author
  * @version 1.0
  * @date    February 19th, 2024 12:00 PM
  */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "cjext.h"
 #include "ezlopi_util_trace.h"

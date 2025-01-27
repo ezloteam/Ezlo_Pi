@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,8 @@
 
 /**
  * @file    ezlopi_cloud_settings.h
- * @brief
- * @authors Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @brief   Decleration for cloud settings functions
+ * @authors
  * @version 1.0
  * @date    November 1st, 2023 2:00 PM
  */

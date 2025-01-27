@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,16 +31,14 @@
 
 /**
  * @file    ezlopi_service_led_indicator.h
- * @brief
- * @authors Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @brief   This file contains function definitons for LED indicator for device on, Wifi connected, internet available and connected to cloud
+ * @author  
  * @version 1.0
- * @date    April 3rd, 2024 6:33 PM
+ * @date    April 3, 2024
  */
 
-#ifndef _EZLOPI_SERVICE_LED_INDICATOR_H_
-#define _EZLOPI_SERVICE_LED_INDICATOR_H_
+#ifndef _EZLOPI_SERVICE_LED_INDICATOR_H___
+#define _EZLOPI_SERVICE_LED_INDICATOR_H___
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
 
@@ -93,7 +91,7 @@ extern "C"
 
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
-#endif // _EZLOPI_SERVICE_LED_INDICATOR_H_
+#endif // __EZLOPI_SERVICE_LED_INDICATOR_H__
 
 /*******************************************************************************
  *                          End of File

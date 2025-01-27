@@ -1,6 +1,6 @@
 
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,7 @@
 /**
  * @file    sensor_0070_ADC_dummy_potentiometer.h
  * @brief   perform some function on sensor_0070
- * @authors Lomas Subedi
- *          Riken Maharjan
- *          Nabin Dangi
+ * @author
  * @version 0.1
  * @date    xx
  */
