@@ -358,7 +358,7 @@ unsigned long long EZPI_core_factory_info_v3_get_id(void)
 
         for (int i = 0; i < 8; i++)
         {
-            _id |= tmp_id_arr[i] << (i * 8);
+            _id |= ((unsigned long long)tmp_id_arr[i]) << (i * 8);
         }
     }
     else
