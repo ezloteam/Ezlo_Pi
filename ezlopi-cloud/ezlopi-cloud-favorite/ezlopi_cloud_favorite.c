@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_favorite.c
  * @brief   Definitions for cloud favorite functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    October 24th, 2022 12:25 PM
  */
 
 /*******************************************************************************

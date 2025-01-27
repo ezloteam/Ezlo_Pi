@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_uart.h
  * @brief   Contains function declarations related to UART communication
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    July 21st, 2022 9:28 PM
  */
 #ifndef __EZLOPI_SERVICE_UART_H__
 #define __EZLOPI_SERVICE_UART_H__

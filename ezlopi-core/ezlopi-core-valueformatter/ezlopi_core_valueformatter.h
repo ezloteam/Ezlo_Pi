@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_valueformatter.h
  * @brief   perform some function on valueformatting operation
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

@@ -1,5 +1,11 @@
 
-
+/**
+ * @file    ezlopi_service_gpioisr.c
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -34,7 +40,7 @@
 /**
  * @file    ezlopi_service_gpioisr.c
  * @brief   Contains function definitions related to GPIO ISR
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    November 23, 2024
  */

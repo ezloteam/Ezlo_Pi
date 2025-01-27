@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_room_subtype_macro.h
  * @brief   Macros for room types
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    January 5th, 2024 7:09 PM
  */
 
 /*******************************************************************************

@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_ezlopi.c
  * @brief   Function to initialize ezlopi modules and services
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 3rd, 2022 5:35 PM
  */
 
 /*******************************************************************************

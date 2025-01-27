@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_webprov.h
- * @brief   Contains function declarations related to web provisioning
- * @author  ezlopi_team_np
+ * @brief   ontains function declarations related to web provisioning
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    July 21st, 2022 9:28 PM
  */
 
 #ifndef __EZLOPI_SERVICE_WEBPROV_H__

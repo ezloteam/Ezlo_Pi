@@ -31,7 +31,7 @@
 /**
  * @file    pms5003.h
  * @brief   perform some function on pms5003
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

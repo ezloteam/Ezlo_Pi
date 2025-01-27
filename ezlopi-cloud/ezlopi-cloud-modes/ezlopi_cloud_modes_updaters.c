@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_modes_updaters.c
  * @brief   Definitions for cloud modes updater functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    February 7th, 2024 5:28 PM
  */
 
 /*******************************************************************************

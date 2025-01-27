@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_settings.h
  * @brief   perform some function on settings
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

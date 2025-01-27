@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_security_str.h
  * @brief   Declarations for cloud security strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author  
+ * @version 1.0
+ * @date    May 3rd, 2023 6:25 PM
  */
 
 #ifndef __EZLOPI_CLOUD_SECURITY_STR_H__

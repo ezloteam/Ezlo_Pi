@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0005_I2C_MPU6050.h
  * @brief   perform some function on sensor_0005
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

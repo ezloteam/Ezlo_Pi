@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_gateway.c
  * @brief   Function to operate on gateway
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 18th, 2023 9:03 PM
  */
 
 /*******************************************************************************

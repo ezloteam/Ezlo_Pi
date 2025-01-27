@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0040_other_TCS230.h
  * @brief   perform some function on sensor_0040
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

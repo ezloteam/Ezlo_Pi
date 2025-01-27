@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    ezlopi_cloud_device_types_str.c
+ * @file    ezlopi_cloud_device_types_str.h
  * @brief   Declarations for cloud device type strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 #ifndef __EZLOPI_DEVICE_TYPES_STR_H__

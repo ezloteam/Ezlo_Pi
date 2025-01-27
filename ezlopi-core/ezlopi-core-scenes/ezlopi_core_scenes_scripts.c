@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_scripts.c
  * @brief   Perform operations on Scene-scipts
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 20th, 2023 8:10 PM
  */
 
 /*******************************************************************************

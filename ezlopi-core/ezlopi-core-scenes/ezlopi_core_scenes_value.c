@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_value.c
  * @brief   Function to operate on scene-value-types
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 9th, 2024 9:10 PM
  */
 
 /*******************************************************************************

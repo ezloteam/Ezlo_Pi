@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_cloud_status.h
  * @brief   Declaration for cloud status functions
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    January 20, 2024
  */

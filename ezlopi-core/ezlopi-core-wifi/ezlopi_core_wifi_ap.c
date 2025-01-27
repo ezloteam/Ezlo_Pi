@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_wifi_ap.c
  * @brief   perform some function on wifi-AP (captive portal)
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    January 6th, 2024 11:03 PM
  */
 
 /*******************************************************************************

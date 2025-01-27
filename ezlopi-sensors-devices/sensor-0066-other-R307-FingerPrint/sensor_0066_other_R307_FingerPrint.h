@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0066_other_R307_FingerPrint.h
  * @brief   perform some function on sensor_0066
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

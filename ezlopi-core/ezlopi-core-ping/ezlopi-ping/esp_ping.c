@@ -31,8 +31,8 @@
 /**
  * @file    esp_ping.c
  * @brief   Function to perform pings
- * @author  ezlopi_team_np
- * @version 0.1
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
  * @date    12th DEC 2024
  */
 

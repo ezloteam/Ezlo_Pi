@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_broadcast.c
  * @brief   Function to perform broadcast operations
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -206,7 +206,6 @@ ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data)
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                // printf("----------------- broadcasting: \n%s\r\n", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
@@ -299,7 +298,6 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
     while (curr_method)
     {
         // time_t start_time = EZPI_core_sntp_get_current_time_sec();
-        // printf("%s[%u]: start-time: %lu\r\n", __FILENAME__, __LINE__, start_time);
 
         if (curr_method->func)
         {
@@ -312,7 +310,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
                 int mret = curr_method->func(data);
                 if (EZPI_SUCCESS == mret)
                 {
-                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : ezlopi__str, data);
                     ret = EZPI_SUCCESS;
                     break;
                 }

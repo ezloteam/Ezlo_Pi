@@ -31,7 +31,7 @@
 /**
  * @file    gy271.c
  * @brief   perform some function on gy271
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

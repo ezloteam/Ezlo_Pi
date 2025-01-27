@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_ble_ble_auth.h
- * @brief   File contains functions declaration for user authentication through BLE
- * @author  ezlopi_team_np
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    April 19th, 2023 7:35 PM
  */
 #ifndef __EZLOPI_SERVICE_BLE_BLE_AUT_H__
 #define __EZLOPI_SERVICE_BLE_BLE_AUT_H__

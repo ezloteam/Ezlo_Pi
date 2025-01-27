@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0046_ADC_ACS712_05B_currentmeter.c
  * @brief   perform some function on sensor_0046
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -146,7 +146,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_electric_current;
     item->cloud_properties.scale = scales_ampere;
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 

@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_service_modes.c
  * @brief   Contains function definitions for mode operations
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    February 9, 2024
  */
@@ -273,8 +273,6 @@ static void __ezlopi_service_remove_all_alerts(void)
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
     cJSON *cj_update = EZPI_core_modes_cjson_alarmed(dev_id_str);
-    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
     if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
     {
         cJSON_Delete(__FUNCTION__, cj_update);
@@ -554,7 +552,6 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     // 4. Store to nvs
                     EZPI_core_modes_store_to_nvs();
                     cJSON *cj_update = EZPI_core_modes_cjson_changed();
-                    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
                     if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
                     {
@@ -679,7 +676,10 @@ static void __modes_service(void *pv)
                         EZPI_core_modes_store_to_nvs();
 
                         cJSON *cj_update = EZPI_core_modes_cjson_changed();
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+#endif
 
                         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update))
                         {

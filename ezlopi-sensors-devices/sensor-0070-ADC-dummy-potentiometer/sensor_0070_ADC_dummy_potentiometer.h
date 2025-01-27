@@ -32,7 +32,7 @@
 /**
  * @file    sensor_0070_ADC_dummy_potentiometer.h
  * @brief   perform some function on sensor_0070
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

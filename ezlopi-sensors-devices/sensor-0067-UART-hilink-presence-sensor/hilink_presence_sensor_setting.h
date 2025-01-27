@@ -31,7 +31,7 @@
 /**
  * @file    hilink_presence_sensor_setting.h
  * @brief   perform some function on hilink_presence_sensor_setting
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0037_pms5003_sensor.h
  * @brief   perform some function on sensor_0037
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

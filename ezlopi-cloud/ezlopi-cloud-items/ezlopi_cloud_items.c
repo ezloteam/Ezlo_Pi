@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_items.c
  * @brief   Definitions for cloud items functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    October 29th, 2022 12:26 AM
  */
 
 /*******************************************************************************
@@ -187,8 +187,9 @@ void EZPI_items_set_value_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        uint32_t item_id = 0;
-        CJSON_GET_ID(item_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
+        uint32_t item_id = EZPI_core_cjson_get_id(cj_params, ezlopi__id_str);
+        // CJSON_GET_ID(item_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
+
         TRACE_S("item_id: %X", item_id);
 
         l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();

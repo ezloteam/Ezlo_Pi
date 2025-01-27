@@ -31,7 +31,7 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

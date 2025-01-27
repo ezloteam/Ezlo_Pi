@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_mdns.h
  * @brief   Function to operate on mdns service
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    February 28th, 2024 7:13 PM
  */
 
 #ifndef __EZLOPI_CORE_MDNS_H_
@@ -43,11 +43,7 @@
 
 #ifdef CONFIG_EZPI_SERV_MDNS_EN
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "mdns.h"
-
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************

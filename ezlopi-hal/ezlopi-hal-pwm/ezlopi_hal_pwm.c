@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_hal_pwm.c
  * @brief   perform some function on PWM
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    December 8th, 2022 3:44 PM
  */
 
 /*******************************************************************************

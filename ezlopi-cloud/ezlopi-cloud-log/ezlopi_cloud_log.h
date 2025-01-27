@@ -1,4 +1,3 @@
-
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -31,11 +30,11 @@
 */
 
 /**
- * @file    ezlopi_cloud_log.c
+ * @file    ezlopi_cloud_log.h
  * @brief   Declerations for cloud log functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    May 2nd, 2024 5:21 PM
  */
 
 #ifndef __EZLOPI_CLOUD_LOG_H__

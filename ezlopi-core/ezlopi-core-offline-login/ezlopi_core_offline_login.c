@@ -31,8 +31,8 @@
 /**
  * @file    ezlopi_core_offline_login.c
  * @brief   Function to perform offine login operation
- * @author  ezlopi_team_np
- * @version 0.1
+ * @author
+ * @version 1.0
  * @date    12th DEC 2024
  */
 
@@ -88,12 +88,13 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
         if (cj_user && cj_token && (cJSON_IsString(cj_user)) && (cJSON_IsString(cj_token)))
         {
 
+#warning "Lomas: user-id verification disabled!"
             // char *stored_uesr_id = EZPI_core_nvs_read_user_id_str();
             // if (NULL != stored_uesr_id)
             {
                 // if (0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
                 {
-                    const char *password_saved = EZPI_core_factory_info_v3_get_local_key();
+                    char *password_saved = EZPI_core_factory_info_v3_get_local_key();
                     if (NULL != password_saved)
                     {
                         TRACE_D("password: %s", password_saved);
@@ -112,6 +113,8 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
                         error = EZPI_ERR_INVALID_CREDENTIALS;
                     }
                 }
+
+#warning "Lomas: user-id verification disabled!"
                 // else
                 // {
                 //     error = EZPI_ERR_WRONG_PARAM;

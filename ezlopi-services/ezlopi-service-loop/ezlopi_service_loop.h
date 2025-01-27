@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_loop.h
- * @brief   Contains function declarations related to loop implementation
- * @author  ezlopi_team_np
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    June 20, 2024
+ * @date    Jan 24, 2023
  */
 #ifndef __EZLOPI_SERVICE_TIMER_H__
 #define __EZLOPI_SERVICE_TIMER_H__

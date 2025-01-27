@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_cloud_data.h
  * @brief   Declarations for cloud data function
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    1st January 2024
  */

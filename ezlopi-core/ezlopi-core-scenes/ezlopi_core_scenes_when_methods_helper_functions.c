@@ -31,8 +31,8 @@
 /**
  * @file    ezlopi_core_scenes_when_methods_helper_functions.c
  * @brief   Functions that operates on scene-when-methods
- * @author  ezlopi_team_np
- * @version 0.1
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
  * @date    12th DEC 2024
  */
 
@@ -1265,16 +1265,20 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
                                                                 break;
                                                             }
                                                         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                                         else
                                                         {
                                                             TRACE_E("The old-value-type and new-value-type doesnot match");
                                                         }
+#endif
                                                     }
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                                     else
                                                     {
-                                                        // CJSON_TRACE("cj_device_items_data", cj_device_items_data);
                                                         TRACE_E(" [%s] doesnot exist", cj_item_names->valuestring);
                                                     }
+#endif
                                                 }
                                             }
                                             cJSON_Delete(__FUNCTION__, cj_tmp_value);
@@ -1294,7 +1298,9 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
         // store into user_arg 'save_flag == 1'
         if ((NULL == scene_node->when_block->fields->user_arg) && cj_device_items_data && (true == save_flag))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("first_device_item_data", cj_device_items_data);
+#endif
             scene_node->when_block->fields->user_arg = (void *)cj_device_items_data;
             ret = 1;
         }
@@ -2010,7 +2016,6 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-//-----------------------------------------------------------------------------------------------------
 
 /*******************************************************************************
  *                          End of File

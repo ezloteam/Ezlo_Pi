@@ -1,4 +1,3 @@
-
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -33,9 +32,9 @@
 /**
  * @file    ezlopi_service_uri.h
  * @brief   Contains function declaration related URI
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    January 6th, 2024 11:03 PM
  */
 
 #ifndef __EZLOPI_SERVICE_URI_H__

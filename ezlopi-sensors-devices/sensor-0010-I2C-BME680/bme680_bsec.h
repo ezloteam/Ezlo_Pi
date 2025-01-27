@@ -31,7 +31,7 @@
 /**
  * @file    bme680_bsec.h
  * @brief   perform some function on bme680
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */
@@ -58,8 +58,6 @@ extern "C"
 
 #define BME680_SDA GPIO_NUM_18
 #define BME680_SCL GPIO_NUM_17
-
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
 #define ACTIVE_I2C I2C_NUM_0
 #define BME680_TEST 0

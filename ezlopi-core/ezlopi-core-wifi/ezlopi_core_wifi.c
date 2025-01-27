@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_wifi.c
  * @brief   perform some function on wifi-operations
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -188,7 +188,7 @@ int EZPI_core_wifi_get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
 {
     int ret = 0;
     memset(auth_str, 0, 50);
-    char *auth_mode_str = "";
+    char *auth_mode_str = ezlopi__str;
     switch (mode)
     {
     case WIFI_AUTH_OPEN:
@@ -351,8 +351,8 @@ void ezlopi_wifi_try_connect_task(void *params)
         {
             char ssid[32];
             char pass[32];
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_ssid_str, ssid);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_key_str, pass);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_ssid_str, ssid, sizeof(ssid));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_key_str, pass, sizeof(pass));
             if (('\0' != ssid[0]) && ('\0' != pass))
             {
                 TRACE_D("Trying to connect to %s with password %s", ssid, pass);

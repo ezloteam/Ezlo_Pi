@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0053_UART_GYGPS6MV2.h
  * @brief   perform some function on sensor_0053
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

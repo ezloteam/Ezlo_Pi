@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_boards.h
  * @brief   perform some function on ezlopi-board-type
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

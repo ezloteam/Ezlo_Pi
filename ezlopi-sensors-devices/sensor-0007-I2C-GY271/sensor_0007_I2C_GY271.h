@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0007_I2C_GY271.h
  * @brief   perform some function on sensor_0007
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

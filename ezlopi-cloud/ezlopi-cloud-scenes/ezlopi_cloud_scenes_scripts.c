@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_scenes_scripts.c
  * @brief   Definitions for cloud scenes scripts functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    October 4th, 2023 11:21 PM
  */
 
 /*******************************************************************************

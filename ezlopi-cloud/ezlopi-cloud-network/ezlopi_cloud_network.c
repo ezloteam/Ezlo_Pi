@@ -1,4 +1,3 @@
-
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -32,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_network.c
- * @brief   Definitions for cloud netowrk functions
- * @author  ezlopi_team_np
+ * @brief    Definitions for cloud netowrk functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 15th, 2022 11:57 AM
  */
+
 #include <string.h>
 
 #include "esp_wifi.h"
@@ -215,7 +215,7 @@ void EZPI_network_wifi_try_connect(cJSON *cj_request, cJSON *cj_response)
     if (cj_params)
     {
         char interfaceId[16];
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId, sizeof(interfaceId));
         if (0 == strncmp(ezlopi_wlan0_str, interfaceId, 6))
         {
             cJSON *cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);

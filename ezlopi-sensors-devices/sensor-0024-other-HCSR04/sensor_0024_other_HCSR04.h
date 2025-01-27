@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0024_other_HCSR04.h
  * @brief   perform some function on sensor_0024
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_location.h
  * @brief   Declarations for cloud location functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    January 30th, 2024 9:22 PM
  */
 
 #ifndef __EZLOPI_CLOUD_LOCATION_H__

@@ -1,5 +1,11 @@
 
-
+/**
+ * @file    ezlopi_service_gpioisr.h
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -34,7 +40,7 @@
 /**
  * @file    ezlopi_service_gpioisr.h
  * @brief   Contains function declarations related to GPIO ISR
- * @author  ezlopi_team_np
+ * @author  
  * @version 1.0
  * @date    November 23, 2024
  */
@@ -56,16 +62,16 @@ extern "C"
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function handles the interrupt registered for corresponding GPIO

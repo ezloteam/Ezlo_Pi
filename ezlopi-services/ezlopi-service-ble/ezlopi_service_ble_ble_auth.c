@@ -1,5 +1,11 @@
 
-
+/**
+ * @file    ezlopi_service_ble_ble_auth.c
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -34,7 +40,7 @@
 /**
  * @file    ezlopi_service_ble_ble_auth.c
  * @brief   File contains functions definitions for user authentication through BLE
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    January 22, 2024
  */

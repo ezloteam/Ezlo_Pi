@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0041_ADC_FC28_soilMoisture.c
  * @brief   perform some function on sensor_0041
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

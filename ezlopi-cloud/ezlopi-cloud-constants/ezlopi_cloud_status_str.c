@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_status_strs.c
  * @brief   Definitions for cloud status strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 #ifndef __EZLOPI_CLOUD_STATUS_STR_H__

@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_scenes_status_changed.h
  * @brief   Function to broadcast scene_status info
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

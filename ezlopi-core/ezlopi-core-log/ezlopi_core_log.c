@@ -31,8 +31,7 @@
 /**
  * @file    ezlopi_core_log.c
  * @brief   Function operaters on system-logs
- * @author  ezlopi_team_np
- * @version 0.1
+ * @author
  * @date    12th DEC 2024
  */
 

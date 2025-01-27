@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_heap.c
  * @brief   Function to operate on heap
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -49,6 +49,9 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_heap.h"
+#include "ezlopi_cloud_constants.h"
+
+#ifdef CONFIG_EZPI_HEAP_ENABLE
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -213,7 +216,7 @@ void EZPI_core_util_heap_trace(bool print_freed)
 
             if (curr_node->freer.file_name && curr_node->freer.who && curr_node->allocator.who)
             {
-                printf("%s(%d):: freed, allocator: %s, freerer: %s\r\n", curr_node->freer.file_name, curr_node->freer.line_number, curr_node->allocator.who ? curr_node->allocator.who : "", curr_node->freer.who ? curr_node->freer.who : "");
+                printf("%s(%d):: freed, allocator: %s, freerer: %s\r\n", curr_node->freer.file_name, curr_node->freer.line_number, curr_node->allocator.who ? curr_node->allocator.who : ezlopi__str, curr_node->freer.who ? curr_node->freer.who : ezlopi__str);
             }
             else
             {
@@ -226,7 +229,7 @@ void EZPI_core_util_heap_trace(bool print_freed)
         {
             total_allocated_memory += curr_node->size;
             printf("\033[38:2:255:165:0m%d -> %s(%d):: who: %s, p: 0x%08x, l: %u, h-s: %u\x1B[0m\r\n", count + 1, curr_node->allocator.file_name, curr_node->allocator.line_number,
-                   (curr_node->allocator.who ? curr_node->allocator.who : ""), (uint32_t)curr_node->ptr, curr_node->size, ((xTaskGetTickCount() - curr_node->time_ms) / 1000));
+                   (curr_node->allocator.who ? curr_node->allocator.who : ezlopi__str), (uint32_t)curr_node->ptr, curr_node->size, ((xTaskGetTickCount() - curr_node->time_ms) / 1000));
         }
 
         count++;
@@ -305,6 +308,8 @@ static void __remove_free_node(s_heap_trace_t *heap_node)
         }
     }
 }
+
+#endif // CONFIG_EZPI_HEAP_ENABLE
 
 /*******************************************************************************
  *                          End of File

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0043_ADC_GYML8511_UV_intensity.c
  * @brief   perform some function on sensor_0043
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0052_other_MQ135_NH3_detector.h
  * @brief   perform some function on sensor_0052
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

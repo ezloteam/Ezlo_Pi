@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_valye_type_str.h
  * @brief   Declarations for cloud value type strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 24th, 2023 11:18 AM
  */
 
 #ifndef __EZLOPI_VALUES_STR_H__

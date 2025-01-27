@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_core_websocket_client.c
  * @brief   perform some function on websocket_client
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

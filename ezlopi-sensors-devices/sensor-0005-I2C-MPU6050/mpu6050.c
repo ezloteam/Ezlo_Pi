@@ -31,7 +31,7 @@
 /**
  * @file    mpu6050.c
  * @brief   perform some function on mpu6050
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

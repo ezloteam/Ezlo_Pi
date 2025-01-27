@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_default_modes.c
  * @brief   These files provide default values for house_modes
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    January 31st, 2024 5:28 PM
  */
 
 /*******************************************************************************
@@ -212,6 +212,7 @@ static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_then_methods_helper_func.c
  * @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    October 20th, 2023 7:50 PM
  */
 
 /*******************************************************************************
@@ -540,7 +540,9 @@ int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_
             {
                 if (curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL))
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("present_bool_gpio_value", cj_tmp_value); /*value formatted & value only*/
+#endif
 
                     cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
                     if (cj_val)

@@ -31,7 +31,7 @@
 /**
  * @file    ping.c
  * @brief   perform some function on ping
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

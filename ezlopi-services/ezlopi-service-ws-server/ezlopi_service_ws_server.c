@@ -1,5 +1,12 @@
 
 
+/**
+ * @file    ezlopi_service_ws_server.c
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -34,7 +41,7 @@
 /**
  * @file    ezlopi_service_ws_server.c
  * @brief   Contains function definitions for WS server
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    February 25, 2024
  */
@@ -86,7 +93,6 @@
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
-
 
 /*******************************************************************************
  *                          Extern Data Declarations

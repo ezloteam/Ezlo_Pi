@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_net.h
  * @brief   perform some function on core-net
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

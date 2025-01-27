@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_scenes_populate.h
  * @brief   These function perfrom scenes populate operations
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

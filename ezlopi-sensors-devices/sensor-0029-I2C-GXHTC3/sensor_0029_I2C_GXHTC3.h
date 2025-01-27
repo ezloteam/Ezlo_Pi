@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0029_I2C_GXHTC3.h
  * @brief   perform some function on sensor_0029
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

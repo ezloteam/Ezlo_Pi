@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_hal_system_info.h
  * @brief   perform some function on system-info
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

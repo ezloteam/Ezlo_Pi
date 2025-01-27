@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
  * @brief   Decleration for cloud scenes expressions functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    December 7th, 2023 7:42 PM
  */
 
 #ifndef __SCENES_EXPRESSIONS_H__

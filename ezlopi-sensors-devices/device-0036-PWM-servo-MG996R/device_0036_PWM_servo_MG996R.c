@@ -31,9 +31,9 @@
 /**
  * @file    device_0036_PWM_servo_MG996R.c
  * @brief   perform some function on device_0036
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    xx
+ * @author
+ * @version 1.0
+ * @date    June 7th, 2023 6:14 PM
  */
 
 /*******************************************************************************
@@ -134,7 +134,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.item_name = ezlopi_item_name_dimmer;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -144,8 +144,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
 #if CONFIG_IDF_TARGET_ESP32C3
     item->interface.pwm.pwm_resln = 9;
 #else
@@ -211,7 +211,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result && item)
         {
             int value = 0;
-            CJSON_GET_VALUE_DOUBLE(cj_result, ezlopi_value_str, value);
+            CJSON_GET_VALUE_INT(cj_result, ezlopi_value_str, value);
 
             TRACE_I("gpio_num: %d", item->interface.pwm.gpio_num);
             TRACE_I("item_id: %d", item->cloud_properties.item_id);

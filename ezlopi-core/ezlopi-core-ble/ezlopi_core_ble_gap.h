@@ -31,13 +31,16 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    December 4th, 2022 7:31 PM
  */
 #ifndef _EZLOPI_CORE_BLE_GAP_H_
 #define _EZLOPI_CORE_BLE_GAP_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE

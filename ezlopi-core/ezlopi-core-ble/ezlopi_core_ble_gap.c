@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_ble_gap.c
  * @brief   perform some function on ble-gap-operations
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

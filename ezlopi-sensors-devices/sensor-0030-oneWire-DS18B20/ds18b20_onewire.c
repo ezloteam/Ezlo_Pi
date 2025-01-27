@@ -31,7 +31,7 @@
 /**
  * @file    ds18b20_onewire.c
  * @brief   perform some function on ds18b20
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

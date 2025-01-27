@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0006_I2C_ADXL345.c
  * @brief   perform some function on sensor_0006
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -159,10 +159,10 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         {
             item->interface.i2c_master.enable = true;
             item->interface.i2c_master.channel = I2C_NUM_0;
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
             {

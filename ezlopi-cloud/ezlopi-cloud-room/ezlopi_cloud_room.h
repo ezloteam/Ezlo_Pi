@@ -32,10 +32,11 @@
 /**
  * @file    ezlopi_cloud_room.h
  * @brief   Declerations for cloud room functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_ROOM_H__
 #define __HUB_ROOM_H__
 

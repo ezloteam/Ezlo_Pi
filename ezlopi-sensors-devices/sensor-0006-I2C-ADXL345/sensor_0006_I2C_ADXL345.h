@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0006_I2C_ADXL345.h
  * @brief   perform some function on sensor_0006
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

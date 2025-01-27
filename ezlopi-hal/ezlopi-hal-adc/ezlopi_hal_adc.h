@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_hal_adc.h
  * @brief   perform some function on ADC
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
  */

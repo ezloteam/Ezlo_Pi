@@ -31,11 +31,12 @@
 
 /**
  * @file    gateways_commands_str.c
- * @brief   Definitions for gateway commands strings
- * @author  ezlopi_team_np
+ * @brief    Definitions for gateway commands strings
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    December 25th, 2023 9:01 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/

@@ -32,10 +32,11 @@
 /**
  * @file    ezlopi_cloud_registration.h
  * @brief   Declerations for cloud registration functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_REGISTERATION_H__
 #define __HUB_REGISTERATION_H__
 /*******************************************************************************

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0047_other_HX711_loadcell.h
  * @brief   perform some function on sensor_0047
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

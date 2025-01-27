@@ -31,7 +31,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -394,7 +394,7 @@ static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void *arg, l
     s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
+        CJSON_GET_VALUE_FLOAT(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
         if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, "enstemp"))
         {
             TRACE_E("Failed to write to NVS");
@@ -416,7 +416,7 @@ static int __settings_set_ens160_gas_sensor_relative_humidity_get(void *arg, l_e
     s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
+        CJSON_GET_VALUE_FLOAT(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
         if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, "enshmd"))
         {
             TRACE_E("Failed to write to NVS");

@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_device_group.h
  * @brief   These function perform operation on device-groups
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

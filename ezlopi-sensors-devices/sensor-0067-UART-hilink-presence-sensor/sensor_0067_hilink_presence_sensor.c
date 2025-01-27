@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0067_hilink_presence_sensor.c
  * @brief   perform some function on sensor_0067
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -335,7 +335,7 @@ static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t *item,
     item->interface.uart.enable = true;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
@@ -357,7 +357,7 @@ static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_ite
     item->interface.uart.enable = false;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
@@ -378,7 +378,7 @@ static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t *ite
     item->interface.uart.enable = false;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 

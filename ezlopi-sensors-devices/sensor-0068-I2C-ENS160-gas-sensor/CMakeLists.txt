@@ -42,7 +42,7 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 
 # Register the components
-idf_component_register(SRCS "sensor_0068_ENS160_gas_sensor_settings.c" "ens160.c" "${config_src}"
+idf_component_register(SRCS "sensor_0068_ENS160_gas_sensor.c" "sensor_0068_ENS160_gas_sensor_settings.c" "ens160.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${ESP_IDF_COMPONENTS}
                                         ${EZLOPI_CORE_COMPONENTS}

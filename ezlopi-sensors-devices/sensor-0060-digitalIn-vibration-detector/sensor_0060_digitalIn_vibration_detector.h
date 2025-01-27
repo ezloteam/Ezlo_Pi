@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0060_digitalIn_vibration_detector.h
  * @brief   perform some function on sensor_0060
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

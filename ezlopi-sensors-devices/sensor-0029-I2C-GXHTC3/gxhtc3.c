@@ -31,7 +31,7 @@
 /**
  * @file    gxhtc3.c
  * @brief   perform some function on gxhtc3
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

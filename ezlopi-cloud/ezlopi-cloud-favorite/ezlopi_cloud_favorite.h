@@ -32,10 +32,11 @@
 /**
  * @file    ezlopi_cloud_favorite.h
  * @brief   Declarations for cloud favorite functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_FAVORITE_LIST_H__
 #define __HUB_FAVORITE_LIST_H__
 

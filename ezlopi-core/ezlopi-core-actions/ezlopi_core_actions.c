@@ -29,11 +29,11 @@
 ** ===========================================================================
 */
 /**
- * @file    ezlopi_core_actions.c
- * @brief   These functions perform operation on action-methods
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @file     ezlopi_core_actions.c
+ * @brief    These functions perform operation on action-methods
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version  0.1
+ * @date     July 12th, 2023 7:57 PM
  */
 
 /*******************************************************************************

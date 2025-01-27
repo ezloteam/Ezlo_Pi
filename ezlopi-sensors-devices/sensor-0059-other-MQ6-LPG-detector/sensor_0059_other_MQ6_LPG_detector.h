@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0059_other_MQ6_LPG_detector.h
  * @brief   perform some function on sensor_0059
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

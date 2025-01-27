@@ -31,7 +31,7 @@
 /**
  * @file    device_0009_other_RMT_SK6812.h
  * @brief   perform some function on device_0009
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

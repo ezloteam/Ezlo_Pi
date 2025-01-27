@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0053_UART_GYGPS6MV2.c
  * @brief   perform some function on sensor_0053
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -219,10 +219,10 @@ static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *
 
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
 
     /*Here we decide, when uart is allowed to initialize*/
     GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)item->user_arg;

@@ -1,4 +1,11 @@
 
+/**
+ * @file    ezlopi_service_broadcast.c
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -33,7 +40,7 @@
 /**
  * @file    ezlopi_service_broadcast.c
  * @brief   Contains function definitions for data broadcast
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
  * @date    February 27, 2024
  */

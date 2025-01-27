@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0035_digitalIn_touch_sensor_TPP223B.h
  * @brief   perform some function on sensor_0035
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

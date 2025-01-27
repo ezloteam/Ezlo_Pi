@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_hal_onewire.h
  * @brief   perform some function on OneWire
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
  */

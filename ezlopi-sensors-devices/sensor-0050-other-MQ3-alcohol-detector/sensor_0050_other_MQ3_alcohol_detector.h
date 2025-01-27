@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0050_other_MQ3_alcohol_detector.h
  * @brief   perform some function on sensor_0050
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

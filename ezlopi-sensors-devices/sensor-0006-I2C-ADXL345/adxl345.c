@@ -31,7 +31,7 @@
 /**
  * @file    adxl345.c
  * @brief   perform some function on adxl345
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

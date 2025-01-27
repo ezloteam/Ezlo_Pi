@@ -30,12 +30,13 @@
 */
 
 /**
- * @file    ezlopi_cloud_gateway.c
+ * @file    ezlopi_cloud_gateways.c
  * @brief   Definitions for cloud gateway functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 15th, 2022 11:57 AM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/

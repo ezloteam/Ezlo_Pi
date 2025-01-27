@@ -32,8 +32,8 @@
 /**
  * @file    ezlopi_cloud_status_str.h
  * @brief   Declarations for cloud status strings
- * @author  ezlopi_team_np
- * @version 0.1
+ * @author  
+ * @version 1.0
  * @date    1st January 2024
  */
 

@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_reset.h
  * @brief   perform some function on system-reset
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 5th, 2024 10:26 PM
  */
 
 #ifndef _EZLOPI_CORE_RESET_H_

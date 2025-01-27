@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_registration.c
- * @brief   Definitions for cloud registration functions
- * @author  ezlopi_team_np
+ * @brief    Definitions for cloud registration functions
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 15th, 2022 11:57 AM
  */
 
 /*******************************************************************************

@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_cloud_devices.h
  * @brief   Definitions for cloud device functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    May 24th, 2023 4:58 PM
  */
 
 #ifndef __HUB_DEVICE_LIST_H__

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0069_ze08_ch02_gas_sensor.h
  * @brief   perform some function on sensor_0069_ze08_ch02_gas_sensor
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

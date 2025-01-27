@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_core_api.c
  * @brief   These function perform operation on API-methods
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -138,7 +138,6 @@ cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request, time_t ti
 
                     if (cj_update_response)
                     {
-                        // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
                         // cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
                         // cJSON_AddNullToObject(__FUNCTION__, cj_update_response, ezlopi_error_str);
 

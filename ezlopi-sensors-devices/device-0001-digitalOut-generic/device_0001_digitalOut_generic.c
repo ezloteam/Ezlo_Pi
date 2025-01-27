@@ -31,7 +31,7 @@
 /**
  * @file    device_0001_digitalOut_generic.c
  * @brief   perform some function on device_0001
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
  */
@@ -163,15 +163,15 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
     CJSON_GET_VALUE_BOOL(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
     if (item->interface.gpio.gpio_in.enable)
     {
         CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
         item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
         // item->interface.gpio.gpio_in.interrupt = GPIO_INTR_NEGEDGE;
         item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
@@ -183,9 +183,9 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
 
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
@@ -389,8 +389,6 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
 
         if (NULL != cjson_params)
         {
-            // CJSON_TRACE("cjson_params", cjson_params);
-
             int value = 0;
             cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
@@ -592,7 +590,7 @@ static ezlopi_error_t __settings_set(void *arg, l_ezlopi_device_settings_v3_t *s
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             int32_t value = 0;
-            CJSON_GET_VALUE_DOUBLE(cjson_propertise, ezlopi_value_str, value);
+            CJSON_GET_VALUE_INT(cjson_propertise, ezlopi_value_str, value);
             TRACE_D("Setting Value : %d", value);
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;

@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_scenes_status_changed.c
  * @brief   These function operates on scene status info
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -127,7 +127,9 @@ int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, con
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_room_name_str, ezlopi__str);
             }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
 
             ret = EZPI_core_broadcast_add_to_queue(cj_response, time_stamp);
 
@@ -143,7 +145,7 @@ int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, con
 
 const char *EZPI_core_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char *ret = "";
+    const char *ret = ezlopi__str;
 #if (1 == ENABLE_TRACE)
     switch (scene_status)
     {

@@ -31,7 +31,7 @@
 /**
  * @file    device_0022_PWM_dimmable_lamp.h
  * @brief   perform some function on device_0022
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

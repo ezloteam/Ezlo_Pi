@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_core_valueformatter.c
  * @brief   perform some function on valueformatting operation
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    October 31st, 2023 6:55 PM
  */
 
 /*******************************************************************************

@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_info.c
  * @brief   Definitions for cloud info functions
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 24th, 2022 12:25 PM
  */
 
 /*******************************************************************************
@@ -52,7 +52,7 @@
 #include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_cloud_info.h"
-#include "ezlopi_cloud_keywords.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_coordinates.h"
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -89,15 +89,15 @@ void EZPI_info_get(cJSON *cj_request, cJSON *cj_response)
         char *device_uuid = EZPI_core_factory_info_v3_get_device_uuid();
         // #include "esp_app_format.h"
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_model_str, EZPI_core_factory_info_v3_get_device_type());
-        cJSON_AddStringToObject(__FUNCTION__, cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
+        cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_architecture_str, CONFIG_SDK_TOOLPREFIX);
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_firmware_str, VERSION_STR);
-        cJSON_AddStringToObject(__FUNCTION__, cjson_result, "kernel", "FreeRTOS");
-        cJSON_AddStringToObject(__FUNCTION__, cjson_result, "hardware", CONFIG_IDF_TARGET);
+        cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_kernel_str, ezlopi_FreeRTOS_str);
+        cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_hardware_str, CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(__FUNCTION__, cjson_result, ezlopi_serial_str, EZPI_core_factory_info_v3_get_id());
 
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
-        cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineAnonymousAccess", true);
-        cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineInsecureAccess", true);
+        cJSON_AddBoolToObject(__FUNCTION__, cjson_result, ezlopi_offlineAnonymousAccess_str, true);
+        cJSON_AddBoolToObject(__FUNCTION__, cjson_result, ezlopi_offlineInsecureAccess_str, true);
 
         cJSON *cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_location_str);
         if (cjson_location)
@@ -127,24 +127,24 @@ void EZPI_info_get(cJSON *cj_request, cJSON *cj_response)
                 cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_time_str, build_time);
             }
 
-            cJSON_AddStringToObject(__FUNCTION__, cjson_build, "builder", DEVELOPER);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_build, "branch", CURRENT_BRANCH);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_build, "commit", COMMIT_HASH);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_builder_str, DEVELOPER);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_branch_str, CURRENT_BRANCH);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_commit_str, COMMIT_HASH);
         }
 
-        cJSON *cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "battery");
+        cJSON *cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, device_battery);
         if (cjson_battery)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, "stateOfCharge", 0);
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, "remainingTime", 0);
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, "health", 0);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, ezlopi_stateOfCharge_str, 0);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, ezlopi_remainingTime_str, 0);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, ezlopi_health_str, 0);
             cJSON_AddStringToObject(__FUNCTION__, cjson_battery, ezlopi_status_str, ezlopi__str);
         }
 
         {
             char local_time[100];
             EZPI_core_sntp_get_local_time(local_time, sizeof(local_time));
-            cJSON_AddStringToObject(__FUNCTION__, cjson_result, "localtime", local_time);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_localtime_str, local_time);
         }
 
 #if 0

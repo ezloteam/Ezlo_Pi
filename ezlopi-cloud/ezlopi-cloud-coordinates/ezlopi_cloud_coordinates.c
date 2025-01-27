@@ -32,11 +32,10 @@
 /**
  * @file    ezlopi_cloud_coordinates.c
  * @brief   Definitions for cloud coordinate functions
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    January 7, 2025
- *
- *
+ * @author
+ * @author
+ * @version 1.0
+ * @date    February 19th, 2024 12:00 PM
  */
 
 /*******************************************************************************

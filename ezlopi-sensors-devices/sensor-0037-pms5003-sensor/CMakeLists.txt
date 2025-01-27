@@ -28,4 +28,3 @@ idf_component_register(SRCS "pms_dev_items_prepare.c" "pms5003.c" "${config_src}
                 ${EZLOPI_HAL_COMPONENTS}
                 ${EZLOPI_SERVICE_COMPONENTS}
     )
-   )

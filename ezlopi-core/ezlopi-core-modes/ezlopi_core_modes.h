@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_modes.h
  * @brief   These function perform opertation on HouseModes
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -162,13 +162,13 @@ extern "C"
 
     typedef struct s_alarmed
     {
-        char type[32];                      // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
-        uint32_t entry_delay_sec;           // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started . [The default value is given from 'MODE->s_entry_delay_t' choice]
-        volatile uint32_t time_is_left_sec; // Number of seconds left to the end of the Entry delay.
-        bool silent;                        // Default: false ... When : true ; websocket clients should treat the alarm as the silent alarm: no indication of alarm is allowed.
-        e_modes_alarm_phase_t phase;        // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
-        e_modes_alarm_status_t status;      // --> [Not in  documentation ; Added for broadcast purpose] === House_mode status for 'alaram_phase'
-        s_sources_t *sources;               // Contains an array of devices that waiting for the entry delay to finish. They are security devices which emitted security events
+        char type[32];                 // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
+        uint32_t entry_delay_sec;      // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started . [The default value is given from 'MODE->s_entry_delay_t' choice]
+        uint32_t time_is_left_sec;     // Number of seconds left to the end of the Entry delay.
+        bool silent;                   // Default: false ... When : true ; websocket clients should treat the alarm as the silent alarm: no indication of alarm is allowed.
+        e_modes_alarm_phase_t phase;   // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
+        e_modes_alarm_status_t status; // --> [Not in  documentation ; Added for broadcast purpose] === House_mode status for 'alaram_phase'
+        s_sources_t *sources;          // Contains an array of devices that waiting for the entry delay to finish. They are security devices which emitted security events
     } s_alarmed_t;
 
     typedef struct s_ezlopi_modes

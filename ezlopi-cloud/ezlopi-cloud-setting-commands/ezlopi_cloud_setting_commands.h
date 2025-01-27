@@ -1,4 +1,3 @@
-
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -33,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_setting_commands.h
  * @brief   Declaration for cloud stting commands functions
- * @author  ezlopi_team_np
+ * @authors
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 13th, 2024 5:49 PM
  */
 
 #ifndef __EZLOPI_CLOUD_SETTING_COMMANDS_H__

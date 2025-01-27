@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_meshbot.c
  * @brief   Contains function definitions for meshbot related operations
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    October 20th, 2023 7:50 PM
  */
 
 /*******************************************************************************

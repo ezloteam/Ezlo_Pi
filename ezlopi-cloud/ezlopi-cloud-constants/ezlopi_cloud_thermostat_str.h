@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_thermostat_str.h
  * @brief   Declarations for cloud thermostat strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author
+ * @version 1.0
+ * @date    October 13th, 2022 7:24 PM
  */
 
 #ifndef __EZLOPI_THERMOSTAT_STR_H__

@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_hub_data_list.c
  * @brief   Definitions for hub data list functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 /*******************************************************************************
@@ -98,17 +98,17 @@ void EZPI_hub_data_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON *cj_setting_data_list = cJSON_GetObjectItem(__FUNCTION__, cj_params, "settings");
+            cJSON *cj_setting_data_list = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_settings_str);
             if (cj_setting_data_list)
             {
-                cJSON *cj_settings = cJSON_AddObjectToObject(__FUNCTION__, cj_result, "settings");
-                cJSON *cj_names_array = cJSON_GetObjectItem(__FUNCTION__, cj_setting_data_list, "names");
+                cJSON *cj_settings = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_settings_str);
+                cJSON *cj_names_array = cJSON_GetObjectItem(__FUNCTION__, cj_setting_data_list, ezlopi_names_str);
                 if (cj_names_array && cJSON_IsArray(cj_names_array) && cj_settings)
                 {
-                    cJSON *cj_fileds = cJSON_GetObjectItem(__FUNCTION__, cj_setting_data_list, "fields");
+                    cJSON *cj_fileds = cJSON_GetObjectItem(__FUNCTION__, cj_setting_data_list, ezlopi_fields_str);
                     if (cj_fileds)
                     {
-                        cJSON *cj_include = cJSON_GetObjectItem(__FUNCTION__, cj_fileds, "include");
+                        cJSON *cj_include = cJSON_GetObjectItem(__FUNCTION__, cj_fileds, ezlopi_include_str);
                         if (cj_include && cJSON_IsArray(cj_include))
                         {
                             ezpi_core_hub_data_list_process_settings_data_list(cj_names_array, cj_include, cj_settings);
@@ -129,13 +129,13 @@ static void ezpi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name
     {
     case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
     {
-        char *scale_str = (EZPI_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? "fahrenheit" : "celsius";
+        const char *scale_str = (EZPI_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? scales_fahrenheit : scales_celsius;
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, scale_str);
         break;
     }
     case SETTING_COMMAND_NAME_DATE_FORMAT:
     {
-        char *date_format = (EZPI_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? "mmddyy" : "ddmmyy";
+        const char *date_format = (EZPI_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? ezlopi_mmddyy_str : ezlopi_ddmmyy_str;
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, date_format);
         break;
     }

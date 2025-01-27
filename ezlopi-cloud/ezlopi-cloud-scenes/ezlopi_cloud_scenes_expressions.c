@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
  * @brief   Definitions for cloud scenes expressions functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    December 21st, 2023 10:12 PM
  */
 
 /*******************************************************************************
@@ -128,7 +128,9 @@ void EZPI_scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // CJSON_TRACE("exp-params", cj_params);
+#endif
 
             cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)
@@ -152,7 +154,9 @@ void EZPI_scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            // CJSON_TRACE("expressions params", cj_params);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+            // CJSON_TRACE("expressions params", cj_params);cj_params
+#endif
             cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {

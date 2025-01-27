@@ -31,7 +31,7 @@
 /**
  * @file    jsn_sr04t.h
  * @brief   perform some function on jsn_sr04t
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

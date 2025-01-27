@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_processes.c
  * @brief   Function to perform operation on ezlopi-process/task
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    March 7th, 2024 6:27 PM
  */
 
 /*******************************************************************************
@@ -47,8 +47,8 @@
 #include "freertos/task.h"
 
 #include "ezlopi_util_trace.h"
-
 #include "ezlopi_core_processes.h"
+#include "ezlopi_cloud_constants.h"
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
 /*******************************************************************************
@@ -233,7 +233,7 @@ static void __set_task_to_arry(cJSON *cj_processes_array)
                 TaskStatus_t task_details;
                 vTaskGetInfo(ezlopi_task_info_array[i].task_handle, &task_details, pdTRUE, eInvalid);
                 cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_details.xTaskNumber);
-                cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", (NULL == task_details.pcTaskName ? "" : task_details.pcTaskName));
+                cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", (NULL == task_details.pcTaskName ? ezlopi__str : task_details.pcTaskName));
                 cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", ezlopi_task_info_array[i].stack_depth);
                 cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (ezlopi_task_info_array[i].stack_depth - task_details.usStackHighWaterMark));
                 cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
@@ -244,6 +244,7 @@ static void __set_task_to_arry(cJSON *cj_processes_array)
 }
 
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

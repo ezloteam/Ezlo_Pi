@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_processes.h
  * @brief   Function to perform operation on ezlopi-process/task
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */

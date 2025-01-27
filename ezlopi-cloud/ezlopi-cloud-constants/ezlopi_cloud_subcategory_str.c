@@ -1,3 +1,5 @@
+
+
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -32,9 +34,9 @@
 /**
  * @file    ezlopi_cloud_subcategory_str.c
  * @brief   Definitions for cloud subcategory strings
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 #ifndef __EZLOPI_SUBCATEGORY_H__

@@ -31,7 +31,7 @@
 /**
  * @file    __value_without_less_comparision_operators_macros.h
  * @brief   MACROS to generate enums for 'value_without_less' comparision operators
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

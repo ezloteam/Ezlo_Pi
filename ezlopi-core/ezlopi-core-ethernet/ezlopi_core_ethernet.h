@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_ethernet.h
  * @brief   Function to perform operation on ethernet module
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    May 9th, 2023 6:10 PM
  */
 
 #ifndef _EZLOPI_CORE_ETHERNET_H_

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0010_I2C_BME680.h
  * @brief   perform some function on sensor_0010
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

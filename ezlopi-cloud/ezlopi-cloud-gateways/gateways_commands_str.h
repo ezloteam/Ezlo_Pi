@@ -32,10 +32,11 @@
 /**
  * @file    gateways_commands_str.h
  * @brief   Declerations for gateway commands strings
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    December 25th, 2023 9:01 PM
  */
+
 #ifndef __GATEWAYS_COMMANDS_STR_H__
 #define __GATEWAYS_COMMANDS_STR_H__
 

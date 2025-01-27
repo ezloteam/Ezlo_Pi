@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_system_temperature_sensor.h
  * @brief   Contains function declarations related to system temperature sensor
- * @author  ezlopi_team_np
+ * @authors
  * @version 1.0
- * @date    September 9, 2023
+ * @date    September 9th, 2024 7:15 PM
  */
 
 #include "sdkconfig.h"

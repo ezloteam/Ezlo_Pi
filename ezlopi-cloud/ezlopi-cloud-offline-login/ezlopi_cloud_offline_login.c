@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -32,10 +33,11 @@
 /**
  * @file    ezlopi_cloud_offline_login.c
  * @brief   Definitions for cloud offline login functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    March 26th, 2024 10:59 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/

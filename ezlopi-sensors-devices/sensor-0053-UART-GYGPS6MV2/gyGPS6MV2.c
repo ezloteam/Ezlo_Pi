@@ -31,7 +31,7 @@
 /**
  * @file    gyGPS6MV2.c
  * @brief   perform some function on gyGPS6MV2
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_ota.h
  * @brief   Declerations for cloud OTA functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    March 7th, 2023 8:52 PM
  */
 
 #ifndef __HUB_FIRMWARE_H__

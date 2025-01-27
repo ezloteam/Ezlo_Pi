@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_ota.h
  * @brief   Contains function declarations related to OTA operations
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    April 27th, 2023 6:21 PM
  */
 #ifndef __EZLOPI_SERVICE_OTA_H__
 #define __EZLOPI_SERVICE_OTA_H__

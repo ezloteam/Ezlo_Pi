@@ -3,7 +3,7 @@
 /**
  * @file    ezlopi_cloud_item_name_str.h
  * @brief   Declarations for cloud item name strings
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    1st January 2024
  */
@@ -38,6 +38,14 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_cloud_item_name_str.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 21st, 2022 7:47 PM
+ */
 
 #ifndef __EZLOPI_ITEM_NAME_STR_H__
 #define __EZLOPI_ITEM_NAME_STR_H__

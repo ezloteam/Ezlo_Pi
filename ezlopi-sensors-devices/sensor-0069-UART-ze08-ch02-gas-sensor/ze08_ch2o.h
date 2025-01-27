@@ -31,7 +31,7 @@
 /**
  * @file    ze08_ch2o.h
  * @brief   perform some function on ze08_ch2o
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

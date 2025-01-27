@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_ble.c
  * @brief   Service related functionalities
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    December 8th, 2022 5:39 PM
  */
 
 #include "../../build/config/sdkconfig.h"

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0015_oneWire_DHT11.h
  * @brief   perform some function on sensor_0015
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

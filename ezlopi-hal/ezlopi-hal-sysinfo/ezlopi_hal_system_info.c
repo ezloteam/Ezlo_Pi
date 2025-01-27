@@ -31,9 +31,8 @@
 /**
  * @file    ezlopi_hal_system_info.c
  * @brief   perform some function on System_info
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    xx
+ * @author
+ * @date    January 13th, 2023 5:59 PM
  */
 
 /*******************************************************************************

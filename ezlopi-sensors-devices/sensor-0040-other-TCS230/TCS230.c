@@ -31,7 +31,7 @@
 /**
  * @file    TCS230.c
  * @brief   perform some function on TCS230
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

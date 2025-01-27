@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_hal_spi_master.h
  * @brief   perform some function on SPI
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
  */

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0034_digitalIn_proximity.c
  * @brief   perform some function on sensor_0034
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -143,13 +143,12 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         item->cloud_properties.scale = NULL;
         item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.gpio.gpio_in.enable = true;
         item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
-        // CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_pull_up_str, tmp_var);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
         item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY; // tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
         item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
     }

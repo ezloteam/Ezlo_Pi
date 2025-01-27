@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0027_ADC_waterLeak.c
  * @brief   perform some function on sensor_0027
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

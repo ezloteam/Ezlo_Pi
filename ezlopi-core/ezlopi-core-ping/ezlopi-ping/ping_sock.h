@@ -31,7 +31,7 @@
 /**
  * @file    ping_sock.h
  * @brief   Function to perfrom operations on ping-socket
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

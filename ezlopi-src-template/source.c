@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    1st January 2024
  * @note    additional documentation

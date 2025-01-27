@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_offline_login.h
  * @brief   Definitions for cloud offline login functions
- * @author  ezlopi_team_np
+ * @author
  * @version 1.0
- * @date    January 20, 2024
+ * @date    March 26th, 2024 10:59 PM
  */
 #ifndef __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
 #define __EZLOPI_CLOUD_OFFLINE_LOGIN_H__

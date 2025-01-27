@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_status.c
  * @brief   Definitions for cloud status functions
- * @author  ezlopi_team_np
+ * @authors
  * @version 1.0
- * @date    January 20, 2024
+ * @date    March 7th, 2024 6:27 PM
  */
 
 /*******************************************************************************

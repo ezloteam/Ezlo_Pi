@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_buffer.c
  * @brief   perform some function on system-buffer for messages
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    April 1st, 2024 1:04 PM
  */
 
 /*******************************************************************************

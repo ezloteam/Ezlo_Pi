@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_methods_str.h
  * @brief   Declarations for cloud method strings
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    October 13th, 2022 7:24 PM
  */
 
 #ifndef __EZLOPI_METHODS_STR_H__

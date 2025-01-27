@@ -31,7 +31,7 @@
 /**
  * @file    __in_array_comparision_operators_macros.h
  * @brief   MACROS to generate enums for in-array comparision operators
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

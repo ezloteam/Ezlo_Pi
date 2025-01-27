@@ -31,7 +31,7 @@
 /**
  * @file    device_0004_digitalIn_generic.h
  * @brief   perform some function on device_0004
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
  */

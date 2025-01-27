@@ -31,7 +31,7 @@
 /**
  * @file    dht22.h
  * @brief   perform some function on dht22
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0018_other_internal_hall_effect.c
  * @brief   perform some function on sensor_0018
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

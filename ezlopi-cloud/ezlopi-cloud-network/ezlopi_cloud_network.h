@@ -32,10 +32,11 @@
 /**
  * @file    ezlopi_cloud_network.h
  * @brief   Declerations for cloud network functions
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 15th, 2022 11:57 AM
  */
+
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 

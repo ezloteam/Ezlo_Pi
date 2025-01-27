@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_delete.c
  * @brief   This files include functions that delete scence-info or scene itself
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    June 13th, 2023 2:29 PM
  */
 
 /*******************************************************************************
@@ -237,17 +237,12 @@ void EZPI_core_scenes_delete_field_value(l_fields_v2_t *field)
     }
 }
 
-#if 0
-// void ezlopi_scenes_delete_by_id(uint32_t _id)
-// {
-//     EZPI_core_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id)); /*THIS 'EZPI_core_scenes_pop_by_id_v2' creates linking issue*/
-// }
-#endif
 /*******************************************************************************
  *                         Static Function Definitions
  *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

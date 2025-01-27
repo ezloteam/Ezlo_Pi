@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_scenes_v2_type_declaration.h
  * @brief   This file contains all scene-related Type-defines
- * @author  ezlopi_team_np
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */

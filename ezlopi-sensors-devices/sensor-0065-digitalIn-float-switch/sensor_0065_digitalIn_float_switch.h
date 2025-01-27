@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0065_digitalIn_float_switch.h
  * @brief   perform some function on sensor_0065
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

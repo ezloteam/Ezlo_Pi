@@ -31,7 +31,7 @@
 /**
  * @file    device_0038_other_RGB.h
  * @brief   perform some function on device_0038
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

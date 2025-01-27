@@ -31,7 +31,7 @@
 /**
  * @file    TSL256_interface.c
  * @brief   perform some function on TSL256_interface
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

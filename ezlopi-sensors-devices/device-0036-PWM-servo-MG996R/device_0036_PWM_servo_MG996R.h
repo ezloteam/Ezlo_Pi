@@ -31,7 +31,7 @@
 /**
  * @file    device_0036_PWM_servo_MG996R.h
  * @brief   perform some function on device_0036
- * @author  ezlopi_team_np
+ * @author
  * @version 0.1
  * @date    xx
  */

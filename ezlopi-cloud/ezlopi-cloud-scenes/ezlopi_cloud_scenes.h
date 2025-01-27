@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_cloud_scenes.h
  * @brief   Declerations for cloud scenes functions
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 20, 2024
+ * @date    August 15th, 2022 11:57 AM
  */
 
 #ifndef __HUB_SCENES_LIST_H__

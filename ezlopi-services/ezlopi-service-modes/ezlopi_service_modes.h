@@ -32,7 +32,7 @@
 /**
  * @file    ezlopi_service_modes.h
  * @brief   Contains function declarations for mode operations
- * @author  ezlopi_team_np
+ * @author  
  * @version 1.0
  * @date    February 9, 2024
  */

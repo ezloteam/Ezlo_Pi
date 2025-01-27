@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_methods.c
  * @brief   This file contains function to return scene-methods
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    September 5th, 2023 6:56 PM
  */
 
 /*******************************************************************************
@@ -137,6 +137,7 @@ e_scenes_method_category_t EZPI_scene_get_scene_method_category_enum(char *metho
  *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

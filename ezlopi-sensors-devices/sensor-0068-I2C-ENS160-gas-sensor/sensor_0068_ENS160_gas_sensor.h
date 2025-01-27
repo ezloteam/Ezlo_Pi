@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0068_ENS160_gas_sensor.h
  * @brief   perform some function on sensor_0068_ENS160
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

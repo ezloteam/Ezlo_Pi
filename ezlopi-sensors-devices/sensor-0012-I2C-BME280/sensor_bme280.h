@@ -31,7 +31,7 @@
 /**
  * @file    sensor_bme280.h
  * @brief   perform some function on bme280
- * @author  ezlopi_team_np
+ * @author  
  * @version 0.1
  * @date    xx
  */

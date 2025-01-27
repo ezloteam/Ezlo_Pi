@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_service_ble_security.c
  * @brief   Security service related functionalities
- * @author  ezlopi_team_np
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 1.0
- * @date    January 22, 2024
+ * @date    July 10, 2022
  */
 
 #include "../../build/config/sdkconfig.h"

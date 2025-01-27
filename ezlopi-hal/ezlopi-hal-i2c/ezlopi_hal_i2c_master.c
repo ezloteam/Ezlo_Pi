@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_hal_i2c_master.c
  * @brief   perform some function on I2C
- * @author  ezlopi_team_np
- * @version 0.1
- * @date    xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 13th, 2022 7:24 PM
  */
 
 /*******************************************************************************
