@@ -77,6 +77,7 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
+#if 0
 void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -104,6 +105,7 @@ void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+#endif
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/

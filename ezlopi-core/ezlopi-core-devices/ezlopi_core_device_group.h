@@ -90,7 +90,7 @@ extern "C"
         cJSON *exceptions; // array of DeviceIds to exclude from this group
         char *name;        // device_group_name
         char *package_id;
-        e_protect_entrydelay_t entry_delay; // e
+        e_protect_entrydelay_t entry_delay; // derived from 'signal_protect' feature
         e_ezlopi_device_grp_role_type_t role;
         uint32_t _id; // perticular device_group_id
         bool persistent;

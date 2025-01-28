@@ -514,7 +514,7 @@ cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str) // (IN core
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
 
-#warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime] ; it needs 'PROTECT' feature implementation ; incomplete. "
             }
         }
     }

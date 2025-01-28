@@ -73,7 +73,7 @@ extern "C"
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
-    void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response);
+    // void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }
