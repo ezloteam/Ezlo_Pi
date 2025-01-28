@@ -60,6 +60,7 @@ extern "C"
      *                          Type & Macro Declarations
      *******************************************************************************/
 
+
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -101,7 +102,7 @@ extern "C"
      * @param dev_id_str Id of target MODE.
      * @return cJSON *
      */
-    cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str);
+    cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str);
 
 #ifdef __cplusplus
 }

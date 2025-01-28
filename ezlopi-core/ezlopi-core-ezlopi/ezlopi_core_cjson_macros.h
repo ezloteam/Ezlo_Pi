@@ -56,7 +56,7 @@ extern "C"
      *                          Type & Macro Declarations
      *******************************************************************************/
 
-    void EZPI_core_cjson_trace(char *name_str, cJSON *cj_object);
+    void EZPI_core_cjson_trace(const char *name_str, cJSON *cj_object);
 
     int EZPI_core_cjson_get_value_gpio(cJSON *cj_root, const char *item_name_str);
     void EZPI_core_cjson_get_value_int(cJSON *cj_root, const char *item_name_str, int *item_val);

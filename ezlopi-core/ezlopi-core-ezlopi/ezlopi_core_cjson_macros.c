@@ -139,7 +139,7 @@ void EZPI_core_cjson_get_value_bool(cJSON *cj_root, const char *item_name_str, b
     }
 }
 
-void EZPI_core_cjson_trace(char *name_str, cJSON *cj_object)
+void EZPI_core_cjson_trace(const char *name_str, cJSON *cj_object)
 {
     if (cj_object)
     {
