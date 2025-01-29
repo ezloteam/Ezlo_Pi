@@ -217,7 +217,11 @@ extern "C"
     extern const char *ezlopi_hub_modes_protect_devices_added;
     extern const char *ezlopi_hub_modes_protect_devices_removed;
     extern const char *ezlopi_hub_modes_entry_delay_changed;
-
+    extern const char *ezlopi_hub_modes_swinger_shutdown_reset_done;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_disable_added;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_disable_removed;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_limit_changed;
+    extern const char *ezlopi_hub_modes_local_alarmed_turned_off;
 #ifdef __cplusplus
 }
 #endif

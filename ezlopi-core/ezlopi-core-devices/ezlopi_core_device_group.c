@@ -168,27 +168,27 @@ cJSON *EZPI_core_device_group_create_cjson(l_ezlopi_device_grp_t *devgrp_node)
             { // add 'entryDelay'
                 switch (devgrp_node->entry_delay)
                 {
-                case EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL:
+                case EZLOPI_PROTECT_ENTRYDELAY_NORMAL:
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_entryDelay_str, ezlopi_normal_str);
                     break;
                 }
-                case EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED:
+                case EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED:
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_entryDelay_str, ezlopi_long_extended_str);
                     break;
                 }
-                case EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED:
+                case EZLOPI_PROTECT_ENTRYDELAY_EXTENDED:
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_entryDelay_str, ezlopi_extended_str);
                     break;
                 }
-                case EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT:
+                case EZLOPI_PROTECT_ENTRYDELAY_INSTANT:
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_entryDelay_str, ezlopi_instant_str);
                     break;
                 }
-                case EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE:
+                case EZLOPI_PROTECT_ENTRYDELAY_NONE:
                 default:
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_entryDelay_str, ezlopi_none_str);
@@ -590,11 +590,11 @@ static void __EZPI_core_device_group_print(l_ezlopi_device_grp_t *device_grp_nod
         CJSON_TRACE("\t|-- Devices", device_grp_node->devices);
         CJSON_TRACE("\t|-- Exceptions", device_grp_node->exceptions);
         TRACE_D("\t|-- Persistent: %s", device_grp_node->persistent ? ezlopi_true_str : ezlopi_false_str);
-        TRACE_D("\t|-- Entry_Delay: %s", (EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL == device_grp_node->entry_delay)          ? ezlopi_normal_str
-                                         : (EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED == device_grp_node->entry_delay) ? ezlopi_long_extended_str
-                                         : (EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED == device_grp_node->entry_delay)      ? ezlopi_extended_str
-                                         : (EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT == device_grp_node->entry_delay)       ? ezlopi_instant_str
-                                                                                                                        : ezlopi_none_str);
+        TRACE_D("\t|-- Entry_Delay: %s", (EZLOPI_PROTECT_ENTRYDELAY_NORMAL == device_grp_node->entry_delay)          ? ezlopi_normal_str
+                                         : (EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED == device_grp_node->entry_delay) ? ezlopi_long_extended_str
+                                         : (EZLOPI_PROTECT_ENTRYDELAY_EXTENDED == device_grp_node->entry_delay)      ? ezlopi_extended_str
+                                         : (EZLOPI_PROTECT_ENTRYDELAY_INSTANT == device_grp_node->entry_delay)       ? ezlopi_instant_str
+                                                                                                                     : ezlopi_none_str);
         TRACE_D("\t|-- Follow_Entry: %s", device_grp_node->follow_entry ? ezlopi_true_str : ezlopi_false_str);
         TRACE_D("\t|-- Role: %s", (EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES == device_grp_node->role) ? ezlopi_house_modes_str : ezlopi_user_str);
         TRACE_D("\t|-- Package_Id: %s", device_grp_node->package_id);
@@ -707,29 +707,29 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str);
         if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
         {
-            req_devgrp_node->entry_delay = ((EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7))           ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
-                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
-                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9))       ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
-                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8))        ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
-                                                                                                                                                                : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
+            req_devgrp_node->entry_delay = ((EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7))           ? EZLOPI_PROTECT_ENTRYDELAY_NORMAL
+                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED
+                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9))       ? EZLOPI_PROTECT_ENTRYDELAY_EXTENDED
+                                            : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8))        ? EZLOPI_PROTECT_ENTRYDELAY_INSTANT
+                                                                                                                                                                : EZLOPI_PROTECT_ENTRYDELAY_NONE);
         }
         else
         {
             switch (req_devgrp_node->entry_delay)
             {
-            case EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL:
+            case EZLOPI_PROTECT_ENTRYDELAY_NORMAL:
                 cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str, ezlopi_normal_str);
                 break;
-            case EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED:
+            case EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED:
                 cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str, ezlopi_long_extended_str);
                 break;
-            case EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED:
+            case EZLOPI_PROTECT_ENTRYDELAY_EXTENDED:
                 cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str, ezlopi_extended_str);
                 break;
-            case EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT:
+            case EZLOPI_PROTECT_ENTRYDELAY_INSTANT:
                 cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str, ezlopi_instant_str);
                 break;
-            case EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE:
+            case EZLOPI_PROTECT_ENTRYDELAY_NONE:
             default:
                 cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str, ezlopi_none_str);
                 break;
@@ -1144,11 +1144,11 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, ezlopi_entryDelay_str);
                 if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
                 {
-                    new_device_grp_node->entry_delay = ((EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7))           ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
-                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
-                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9))       ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
-                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8))        ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
-                                                                                                                                                                            : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
+                    new_device_grp_node->entry_delay = ((EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7))           ? EZLOPI_PROTECT_ENTRYDELAY_NORMAL
+                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED
+                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9))       ? EZLOPI_PROTECT_ENTRYDELAY_EXTENDED
+                                                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8))        ? EZLOPI_PROTECT_ENTRYDELAY_INSTANT
+                                                                                                                                                                            : EZLOPI_PROTECT_ENTRYDELAY_NONE);
                 }
             }
 

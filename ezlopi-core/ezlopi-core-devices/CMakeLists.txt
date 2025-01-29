@@ -9,6 +9,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-actions
         ezlopi-core-devices
         ezlopi-core-errors
+        ezlopi-core-protect
 )
 set(EZLOPI_HAL_COMPONENTS
         ezlopi-hal-gpio
@@ -104,5 +105,3 @@ idf_component_register(SRCS "ezlopi_core_devices_list.c" "ezlopi_core_device_gro
                                         ${EZLOPI_CLOUD_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}
                         )
-
-

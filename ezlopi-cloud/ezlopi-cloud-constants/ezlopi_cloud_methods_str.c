@@ -218,6 +218,11 @@ const char *ezlopi_hub_modes_protect_button_removed = "hub.modes.protect.button.
 const char *ezlopi_hub_modes_protect_devices_added = "hub.modes.protect.devices.added";
 const char *ezlopi_hub_modes_protect_devices_removed = "hub.modes.protect.devices.removed";
 const char *ezlopi_hub_modes_entry_delay_changed = "hub.modes.entry_delay.changed";
+const char *ezlopi_hub_modes_swinger_shutdown_reset_done = "hub.modes.swinger.shutdown.reset.done";
+const char *ezlopi_hub_modes_swinger_shutdown_disable_added = "hub.modes.swinger.shutdown.disable.added";
+const char *ezlopi_hub_modes_swinger_shutdown_disable_removed = "hub.modes.swinger.shutdown.disable.remved";
+const char *ezlopi_hub_modes_swinger_shutdown_limit_changed = "hub.modes.swinger.shutdown.limits.changed";
+const char *ezlopi_hub_modes_local_alarmed_turned_off = "hub.modes.local.alarmed.turned.off";
 
 /*******************************************************************************
  *                          Extern Function Definitions

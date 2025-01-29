@@ -27,6 +27,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-log
         ezlopi-cloud-hub-data-list
         ezlopi-cloud-setting-commands
+        ezlopi-cloud-protect
 )
 
 set(EZLOPI_CORE_COMPONENTS
