@@ -814,7 +814,7 @@ static char *ezpi_generate_sha1_of_src(const char *src)
         if (!mbedtls_sha1_self_test(1))
         {
             unsigned char sha1_hash[20];
-
+            memset(sha1_hash, 0, 20);
             if (0 == mbedtls_sha1_ret((unsigned char *)src, strlen(src), sha1_hash))
             {
                 ret = (char *)ezlopi_malloc(__FUNCTION__, sizeof(unsigned char) * 20);

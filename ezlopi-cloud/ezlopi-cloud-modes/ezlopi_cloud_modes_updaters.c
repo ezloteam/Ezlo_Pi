@@ -141,7 +141,7 @@ void EZPI_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
 
             cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
             cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
-#warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime] ,  it needs 'PROTECT' feature implementation ; incomplete. "
         }
     }
 }
@@ -603,6 +603,99 @@ void EZPI_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+void EZPI_cloud_modes_swinger_shutdown_reset_done(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_swinger_shutdown_reset_done);
+
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON_AddItemToObject(__func__, cj_result, ezlopi_deviceId_str, cJSON_Duplicate(__func__, cj_params, true));
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_disable_added(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_swinger_shutdown_disable_added);
+
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON_AddItemToObject(__func__, cj_result, ezlopi_deviceId_str, cJSON_Duplicate(__func__, cj_params, true));
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_disable_removed(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_swinger_shutdown_disable_removed);
+
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+#warning "need to free the duplicated cjson , if failed to append the item to obj";
+            cJSON_AddItemToObject(__func__, cj_result, ezlopi_deviceId_str, cJSON_Duplicate(__func__, cj_params, true));
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_limit_changed(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__func__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_swinger_shutdown_limit_changed);
+
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_device_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_device_id && cj_device_id->valuestring)
+            {
+                cJSON_AddStringToObject(__func__, cj_result, ezlopi_deviceId_str, cj_device_id->valuestring);
+            }
+        }
+    }
+}
+
+void EZPI_cloud_modes_local_alarmed_turned_off(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_local_alarmed_turned_off);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    { // empty
+    }
+}
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/

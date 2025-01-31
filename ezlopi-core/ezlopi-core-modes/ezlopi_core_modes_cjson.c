@@ -311,12 +311,12 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
             cJSON *cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_devices_str);
             if (cj_devices)
             {
-                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);
+                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true); // Array of device id with security sensors
             }
         }
 
         {
-            cJSON *cj_alarms = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_alarms_str);
+            cJSON *cj_alarms = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_alarms_str); // Array of device id which make alarms after trips
             if (cj_alarms)
             {
                 parsed_mode->cj_alarms = cJSON_Duplicate(__FUNCTION__, cj_alarms, true);
@@ -324,7 +324,7 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
         }
 
         {
-            cJSON *cj_cameras = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_cameras_str);
+            cJSON *cj_cameras = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_cameras_str); // Array of camera device identifiers with items named 'make_recording'
             if (cj_cameras)
             {
                 parsed_mode->cj_cameras = cJSON_Duplicate(__FUNCTION__, cj_cameras, true);
@@ -476,7 +476,7 @@ cJSON *EZPI_core_modes_cjson_changed(void) //  (IN core-service-loop) // For bro
     return cj_root;
 }
 
-cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
+cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
 {
     cJSON *cj_root = cJSON_CreateObject(__FUNCTION__);
     if (cj_root)
@@ -511,7 +511,7 @@ cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
 
-#warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime] ; it needs 'PROTECT' feature implementation ; incomplete. "
             }
         }
     }

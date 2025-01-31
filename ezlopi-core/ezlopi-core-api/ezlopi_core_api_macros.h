@@ -107,6 +107,16 @@ extern "C"
     CLOUD_METHOD("hub.modes.protect.devices.remove", EZPI_cloud_modes_protect_devices_remove, EZPI_cloud_modes_protect_devices_removed)
     CLOUD_METHOD("hub.modes.entry_delay.set", EZPI_cloud_modes_entry_delay_set, EZPI_cloud_modes_entry_delay_changed)
     CLOUD_METHOD("hub.modes.entry_delay.reset", EZPI_cloud_modes_entry_delay_reset, EZPI_cloud_modes_entry_delay_changed)
+
+    CLOUD_METHOD("hub.modes.swinger.shutdown.list", EZPI_cloud_modes_swinger_shutdown_list, NULL)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.reset", EZPI_cloud_modes_swinger_shutdown_reset, EZPI_cloud_modes_swinger_shutdown_reset_done)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.disable.add", EZPI_cloud_modes_swinger_shutdown_disabled_add, EZPI_cloud_modes_swinger_shutdown_disable_added)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.disable.remove", EZPI_cloud_modes_swinger_shutdown_disabled_remove, EZPI_cloud_modes_swinger_shutdown_disable_removed)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.limit.set", EZPI_cloud_modes_swinger_shutdown_limit_set, EZPI_cloud_modes_swinger_shutdown_limit_changed)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.limit.reset", EZPI_cloud_modes_swinger_shutdown_limit_reset, EZPI_cloud_modes_swinger_shutdown_limit_changed)
+    CLOUD_METHOD("hub.modes.local.alarm.off", EZPI_cloud_modes_local_alarm_off, EZPI_cloud_modes_local_alarmed_turned_off)
+    CLOUD_METHOD("hub.modes.force_disarm", EZPI_cloud_modes_force_disarm, EZPI_cloud_modes_alarmed)
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
     CLOUD_METHOD("hub.favorite.list", EZPI_favorite_list_v3, NULL)
@@ -200,6 +210,8 @@ extern "C"
 
     CLOUD_METHOD("hub.setting.value.set", EZPI_setting_value_set, EZPI_setting_value_set_broadcast_updater)
     CLOUD_METHOD("hub.settings.list", EZPI_settings_list, NULL)
+
+    // CLOUD_METHOD("hub.protect.signal.list", EZPI_cloud_protect_signal_list, NULL)
 
 #endif // (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))
 

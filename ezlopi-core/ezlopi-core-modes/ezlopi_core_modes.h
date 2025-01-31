@@ -113,7 +113,7 @@ extern "C"
         uint32_t alarm_delay_sec;     // Delay before sending alert if armed sensors (door/window or motion sensor) tripped .
         bool armed;                   // flag to indicate if the mode enters the alarmed mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
         bool protect;                 // Enables or disables Ezlo Protect for a particular house mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
-        bool disarmed_default;        // if true ; utilize the disarmed devices.
+        bool disarmed_default;        // if true ; set all security sensor (in curr houseMode) is disarmed by default.
         bool notify_all;              // This Flag indicates, notifiations trigger to all user_IDs
 
         cJSON *cj_notifications;       // Specific list of user_IDs to notify
@@ -160,6 +160,17 @@ extern "C"
 
     } s_sources_t;
 
+    typedef struct s_system_test
+    {
+        uint32_t started_at;      // Timestamp of the moment when the test was started
+        uint32_t duration;        // The initial or modified duration of a test. Contains initial test duration interval, or actual test duration + test duration interval, if the test was extended.
+        uint32_t time_is_left;    // How much time is left till the end of the test
+        const char *operation_id; // Operation identifier of a test, can be used to identify all events that belong to the test.
+        const char *type;         // Type of a system test, walk for sensor walk test.
+        struct s_sources *next;
+
+    } s_system_test_t;
+
     typedef struct s_alarmed
     {
         char type[32];                 // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
@@ -181,7 +192,7 @@ extern "C"
         uint32_t alarm_delay;                //  Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
         uint32_t switch_to_delay_runs_out;   //  A period of 'exit-time-delay' ; switching to/from the armed mode.
 
-        cJSON *cj_alarms;  // Array of device id which make alarms after trips (Main alert list)
+        cJSON *cj_alarms;  // Array of sensors/devices with ability to alarm us after it trips.
         cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording
         cJSON *cj_devices; // Array of device id with security sensors
         s_protect_buttons_t *l_protect_buttons;
@@ -198,6 +209,18 @@ extern "C"
 
     } s_ezlopi_modes_t;
 
+    typedef struct l_modes_alert
+    {
+        bool alert_trig;               // default 'false' [guard to trigger alert]
+        uint32_t u_id;                 // ID of security device 'uuid'
+        uint32_t abort_window_ll;      // abort alarm-broadcast with this time   (Phase 1)
+        uint32_t alarm_delay_ll;       // delay before triggering an alert       (Phase 2)
+        uint32_t timeleft_to_abort_ll; // time limit within which it is possible to abort a trigger-alert
+        uint32_t timeleft_to_alarm_ll; // custome delay-time assigned before alarm triggers
+
+        struct l_modes_alert *next;
+    } l_modes_alert_t;
+
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -205,6 +228,24 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+    /**
+     * @brief Function return 'alert_ll' head_node
+     *
+     */
+    l_modes_alert_t *EZPI_core_modes_get_alert_head(void);
+    /**
+     * @brief Function to add alert triggers for target device_id
+     *
+     * @param u_id Target device_id
+     * @param ez_mode Pointer to current HouseMode
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode);
+    /**
+     * @brief Function to remove all alerts
+     *
+     */
+    void EZPI_core_modes_remove_all_alerts(void);
 
     /**
      * @brief This function initializes House-mode task
@@ -221,7 +262,7 @@ extern "C"
     ezlopi_error_t EZPI_core_modes_store_to_nvs(void);
 
     /**
-     * @brief This function initializes default house-mode information
+     * @brief This function returns default house-mode information
      */
     s_ezlopi_modes_t *EZPI_core_default_mode_get(void);
     /**
@@ -454,6 +495,64 @@ extern "C"
      * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_modes_api_reset_entry_delay(void);
+    /**
+     * @brief Function to List limitations and statistics for devices under Swinger Shutdown.
+     *
+     * @param cj_result Pointer to resultant list.
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_result);
+    /**
+     * @brief Function to reset swinger info
+     *
+     * @param u_id Target Device_id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_reset(uint32_t u_id);
+    /**
+     * @brief Function to disable swinger shutdown for target device
+     *
+     * @param u_id Target device id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_add(uint32_t u_id);
+    /**
+     * @brief Function to activate swinger shutdown for target device
+     *
+     * @param u_id Target device id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_remove(uint32_t u_id);
+    /**
+     * @brief Function to set the limits for swinger shutdown of Target device_id
+     *
+     * @param u_id Target device_id
+     * @param hitslimit New hitsLimit for device
+     * @param inactivity_sec New Inactivity Window
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_set(uint32_t u_id, uint32_t hitslimit, uint32_t inactivity_sec);
+    /**
+     * @brief Function to reset Limit values of target device_id to 'global_default' value.
+     *
+     * @param u_id Target device_id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_reset(uint32_t u_id);
+    /**
+     * @brief Function to Turn off the local alarm raised by the sensor in disarmed mode
+     *
+     * @param modeId Target-Mode
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_local_alarm_off(uint8_t modeId);
+    /**
+     * @brief Function to Cancel all security events when the system alarmed during the disarmed mode
+     *
+     * @param modeId Target-Mode
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_force_disarm(uint8_t modeId);
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,44 @@
 
 # RELEASE NOTES
 
+# Version 4.4.13 Build 203
+
+## New
+
+1. Implement : ADC De-Init function with memory cleanup [EZPI-574](https://jira.mios.com/browse/EZPI-574)
+2. Implement : delete_service context functions [EZPI-575](https://jira.mios.com/browse/EZPI-575)
+3. Implement : Error Returns on mDNS Module [EZPI-576](https://jira.mios.com/browse/EZPI-576)
+
+## Fixes
+
+1. Fix: Annotate file and function headers [EZPI-539](https://jira.mios.com/browse/EZPI-539)
+2. Fix: Null pointer dereference : Scenes Populate [EZPI-595](https://jira.mios.com/browse/EZPI-595)
+3. Fix : Possible null pointer dereference: house_mode_id_array [EZPI-596](https://jira.mios.com/browse/EZPI-596)
+4. Fix : invalidFunctionArg : MQ Sensors [EZPI-597](https://jira.mios.com/browse/EZPI-597)
+5. Fix : hub.nma.register.repeat implementation missing / not working [EZPI-455](https://jira.mios.com/browse/EZPI-455)
+6. Fix : Change the author and details position from files [EZPI-483](https://jira.mios.com/browse/EZPI-483)
+7. Fix : Object does not has a parent [EZPI-589](https://jira.mios.com/browse/EZPI-589)
+8. Fix : Shifting 32-bit value by 56 bits is undefined behaviour [shiftTooManyBits] [EZPI-592](https://jira.mios.com/browse/EZPI-592)
+9. Fix : Core Modes -> Null pointer dereference: curr_source [nullPointer] [EZPI-593](https://jira.mios.com/browse/EZPI-593)
+10. Fix : arrayIndexOutOfBounds on ezlopi_core_processes [EZPI-594](https://jira.mios.com/browse/EZPI-594)
+11. Fix : Null pointer dereference : Scenes Populate [EZPI-595](https://jira.mios.com/browse/EZPI-595)
+12. Fix : Possible null pointer dereference: house_mode_id_array [EZPI-596](https://jira.mios.com/browse/EZPI-596)
+13. Fix : Possible null pointer dereference: house_mode_id_array [EZPI-596](https://jira.mios.com/browse/EZPI-596)
+
+## What's Changed
+
+- Revert "Feature kconfig ot" by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/217
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/224
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/225
+- EZPI-537 Apply templates to all source files by @ezlo-gary in https://github.com/ezloteam/Ezlo_Pi/pull/208
+- Dev lastest merge code clean by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/226
+- Ezpi for device test by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/227
+- Ezpi combined fix 593 595 596 597 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/228
+- Espi 583 change author and details positions by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/232
+- Fixed the bug of IndexOutOfBound in \_\_check_ezlopi_task function by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/231
+- Ezpi 576 error return on functions by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/230
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/233
+
 # Version 4.3.12 Build 202
 
 ## New

@@ -111,7 +111,7 @@ extern "C"
   // extern const  char *ezlopi_item_name_barrier_fail_events;
   extern const char *ezlopi_item_name_button_state;
   // extern const  char *ezlopi_item_name_test_state;
-  // extern const  char *ezlopi_item_name_co_alarm;
+  extern const  char *ezlopi_item_name_co_alarm;
   // extern const  char *ezlopi_item_name_maintenance_state;
   extern const char *ezlopi_item_name_sounding_mode;
   // extern const  char *ezlopi_item_name_sound_list;

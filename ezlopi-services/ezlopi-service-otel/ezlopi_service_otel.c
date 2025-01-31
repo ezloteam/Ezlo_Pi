@@ -485,7 +485,15 @@ static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t 
                     __free_telemetry_queue_data(otel_data);
                 }
             }
+            else
+            {
+                ezlopi_free(__FUNCTION__, log);
+            }
         }
+    }
+    else
+    {
+        ezlopi_free(__FUNCTION__, log);
     }
 
     return ret;
